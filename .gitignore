@@ -1,0 +1,24 @@
+# Dependencias de Composer (se regeneran con "composer install")
+/vendor/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de configuración local
+config_local.php
+.env
+config/email.php
+
+# Logs
+*.log
+
+

@@ -1,0 +1,6 @@
+{
+    "require": {
+        "nesbot/carbon": "^3.10",
+        "symfony/mailer": "^7.3"
+    }
+}
