@@ -42,4 +42,4 @@ $logged = $session->sesionActiva();
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../Estructura/footer.php'; ?>
+<?php require_once __DIR__ . '/Estructura/footer.php'; ?>
