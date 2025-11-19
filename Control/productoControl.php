@@ -41,10 +41,10 @@ class ProductoControl
             array_key_exists('procantstock', $param) &&
             array_key_exists('precio', $param) &&
             array_key_exists('prodeshabilitado', $param) &&
-            array_key_exists('imagen', $param)
+            array_key_exists('proimagen', $param)
         ) {
             $obj = new producto();
-            $obj->setear($param['idproducto'], $param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['imagen']);
+            $obj->setear($param['idproducto'], $param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['proimagen']);
         }
         return $obj;
     }
@@ -64,10 +64,10 @@ class ProductoControl
             array_key_exists('procantstock', $param) &&
             array_key_exists('precio', $param) &&
             array_key_exists('prodeshabilitado', $param) &&
-            array_key_exists('imagen', $param)
+            array_key_exists('proimagen', $param)
         ) {
             $obj = new Producto();
-            $obj->setearSinID($param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['imagen']);
+            $obj->setearSinID($param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['proimagen']);
         }
         return $obj;
     }
@@ -121,24 +121,24 @@ class ProductoControl
      *
      * @param array $param
      */
-    public function altaSinID($param)
-    {
-        $resp = false;
+    // public function altaSinID($param)
+    // {
+    //     $resp = false;
 
-        $cImagenes = new ControlImagenes();
-        $arreglo = $cImagenes->cargarImagen('producto', $param['files']['imagen'], 'productos/');
+    //     $cImagenes = new ControlImagenes();
+    //     $arreglo = $cImagenes->cargarImagen('producto', $param['files']['imagen'], 'productos/');
 
-        if ($arreglo['respuesta']) {
-            $param['imagen'] = $arreglo['nombre'];
-            $param['prodeshabilitado'] = null;
-            $objProducto = $this->cargarObjetoSinID($param);
-            if ($objProducto != null and $objProducto->insertar()) {
-                $resp = true;
-            }
-        }
+    //     if ($arreglo['respuesta']) {
+    //         $param['imagen'] = $arreglo['nombre'];
+    //         $param['prodeshabilitado'] = null;
+    //         $objProducto = $this->cargarObjetoSinID($param);
+    //         if ($objProducto != null and $objProducto->insertar()) {
+    //             $resp = true;
+    //         }
+    //     }
         
-        return $resp;
-    }
+    //     return $resp;
+    // }
 
     /**
      * permite eliminar un objeto
@@ -230,8 +230,8 @@ class ProductoControl
             if (isset($param['prodeshabilitado'])) {
                 $where .= " and prodeshabilitado ='" . $param['prodeshabilitado'] . "'";
             }
-            if (isset($param['imagen'])) {
-                $where .= " and imagen ='" . $param['imagen'] . "'";
+            if (isset($param['proimagen'])) {
+                $where .= " and proimagen ='" . $param['proimagen'] . "'";
             }
         }
 
@@ -281,7 +281,7 @@ class ProductoControl
                     "procantstock" => $elem->getProCantStock(),
                     "precio" => $elem->getPrecio(),
                     "deshabilitado" => $elem->getProDeshabilitado(),
-                    "imagen" => $elem->getImagen()
+                    "proimagen" => $elem->getImagen()
                 ];
                 array_push($arreglo, $nuevoElem);
             }
@@ -303,11 +303,11 @@ class ProductoControl
                 if ($producto->getProDeshabilitado() == null || $producto->getProDeshabilitado() == '0000-00-00 00:00:00') {
                     $nuevoElem = [
                         "idproducto" => $producto->getID(),
-                        "imagen" => $producto->getImagen(),
                         "pronombre" => $producto->getProNombre(),
                         "prodetalle" => $producto->getProDetalle(),
                         "procantstock" => $producto->getProCantStock(),
                         "precio" => $producto->getPrecio(),
+                        "proimagen" => $producto->getProImagen(),
                         "prodeshabilitado" => $producto->getProDeshabilitado(),
                         "rol" => null
                     ];
