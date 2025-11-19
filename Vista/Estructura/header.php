@@ -133,8 +133,21 @@ if ($session->sesionActiva()) {
                     foreach ($menuData['right'] as $item) {
                         $url = isset($item['url']) ? $item['url'] : '#';
                         $label = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Accion');
-                        echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'">'.htmlspecialchars($label).'</a></li>';
+                        $icon = isset($item['icon']) ? $item['icon'] : '';
+                        $iconOnly = isset($item['icon_only']) && $item['icon_only'];
 
+                        if ($iconOnly && !empty($icon)) {
+                            // mostrar solo el icono (con aria-label para accesibilidad)
+                            echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'" aria-label="'.htmlspecialchars($label).'">'
+                                . '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt="'.htmlspecialchars($label).'">'
+                                . '</a></li>';
+                        } else {
+                            $iconHtml = '';
+                            if (!empty($icon)) {
+                                $iconHtml = '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt=""> ';
+                            }
+                            echo '<li class="nav-item"><a class="nav-link d-flex align-items-center" href="'.htmlspecialchars($url).'">'.$iconHtml.htmlspecialchars($label).'</a></li>';
+                        }
                     }
 
                 } else {

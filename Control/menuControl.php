@@ -341,10 +341,12 @@ class MenuControl
             $menuFinal['roles'] = $roles;
             $menuFinal['usuario'] = ['nombre' => $sesion->getNombreUsuarioLogueado(), 'rol' => $rol];
             // Agregar opción de cerrar sesión en el menú derecho
-            $menuFinal['right'][] = [
-                'url' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php',
-                'label' => 'Cerrar sesión'
-            ];
+                $menuFinal['right'][] = [
+                    'url' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php',
+                    'label' => 'Cerrar sesión',
+                    'icon' => '/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogout.png',
+                    'icon_only' => true
+                ];
         }
 
         return $menuFinal; //En caso de que no haya sesión activa el retorno quedará vacio, menu.js se encarga de armar la interfaz
