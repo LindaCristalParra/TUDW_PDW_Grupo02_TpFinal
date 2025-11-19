@@ -62,7 +62,7 @@ class MenuControl
     }
 
     /**
-     * Espera como parametro un arreglo asociativo donde las claves coinciden
+     * Espera como parametro un arreglo associativo donde las claves coinciden
      * con los nombres de las variables instancias del objeto que son claves
      * @param array $param
      * @return Menu
@@ -334,13 +334,17 @@ class MenuControl
                 }
             }
 
-
             $arregloRolesUser = $sesion->getRoles(); //Obtenemos sus roles, si es que tiene
             $roles = $this->listarRoles($arregloRolesUser);
 
             $menuFinal['permisos'] = $permisos;
             $menuFinal['roles'] = $roles;
             $menuFinal['usuario'] = ['nombre' => $sesion->getNombreUsuarioLogueado(), 'rol' => $rol];
+            // Agregar opción de cerrar sesión en el menú derecho
+            $menuFinal['right'][] = [
+                'url' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php',
+                'label' => 'Cerrar sesión'
+            ];
         }
 
         return $menuFinal; //En caso de que no haya sesión activa el retorno quedará vacio, menu.js se encarga de armar la interfaz
