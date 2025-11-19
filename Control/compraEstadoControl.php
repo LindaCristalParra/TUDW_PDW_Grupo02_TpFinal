@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/Mailer.php';
 
 class CompraEstadoControl
 {
@@ -235,8 +236,8 @@ class CompraEstadoControl
                 $resp = $this->cambiarEstado($datos, $elem);
             }
         }
-        // FUNCION SYMPHONYMAILER PARA EL ENVIO DEL CORREO POR EL CAMBIO DE ESTADO
-        enviarMail($datos);
+        // Enviar correo mediante el Control/Mailer.php
+        \Mailer::enviarMail($datos);
 
         return $resp;
     }

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/Mailer.php';
 
 class CompraControl
 {
@@ -412,8 +413,8 @@ class CompraControl
                 );
                 $respuesta = $objCompraEstadoControl->modificacion($paramEdicion);
             }
-            // METODO SYMPHONYMAILER PARA EL ENVIO DE CORREO
-            enviarMail(['idcompra' => $idCompra, 'idcompraestadotipo' => 1]);
+            // Enviar correo mediante Control/Mailer.php
+            \Mailer::enviarMail(['idcompra' => $idCompra, 'idcompraestadotipo' => 1]);
         }
         return ['idcompra' => $idCompra, 'respuesta' => $respuesta];
     }

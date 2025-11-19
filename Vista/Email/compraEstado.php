@@ -1,60 +1,50 @@
+<?php
+// Vista/Email/compraEstado.php
+// Plantilla HTML simple para notificar estado de compra
+?>
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>Estado de tu compra</title>
-  <style>
-    body { font-family: Arial, sans-serif; color: #222; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { background: #d9534f; color: white; padding: 12px; }
-    .content { padding: 16px; }
-    .items { margin-top: 12px; }
-    .items table { width: 100%; border-collapse: collapse; }
-    .items th, .items td { border: 1px solid #ddd; padding: 8px; }
-    .total { font-weight: bold; text-align: right; margin-top: 12px; }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estado de tu compra</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f8f9fa; padding: 10px; border-radius: 4px; }
+        .items { margin-top: 10px; }
+        .item { border-bottom: 1px solid #ececec; padding: 8px 0; }
+        .total { font-weight: bold; margin-top: 12px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h2>ChrismasMarket</h2>
-    </div>
-    <div class="content">
-      <p>Hola <?php echo htmlspecialchars($nombre ?? ''); ?>,</p>
-      <p>Queremos informarte que el estado de tu compra <strong>#<?php echo htmlspecialchars($idCompra ?? ''); ?></strong> es:</p>
-      <h3><?php echo htmlspecialchars($estadoTexto ?? ''); ?></h3>
-
-      <?php if (!empty($fecha)): ?>
-        <p>Fecha de actualización: <?php echo htmlspecialchars($fecha); ?></p>
-      <?php endif; ?>
-
-      <?php if (!empty($items) && is_array($items)): ?>
-        <div class="items">
-          <h4>Detalle</h4>
-          <table>
-            <thead>
-              <tr><th>Producto</th><th>Cantidad</th><th>Precio</th></tr>
-            </thead>
-            <tbody>
-              <?php foreach ($items as $it): ?>
-                <tr>
-                  <td><?php echo htmlspecialchars($it['nombre'] ?? $it['pronombre'] ?? ''); ?></td>
-                  <td><?php echo htmlspecialchars($it['cantidad'] ?? $it['cicantidad'] ?? '1'); ?></td>
-                  <td><?php echo htmlspecialchars($it['precio'] ?? ''); ?></td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+    <div class="container">
+        <div class="header">
+            <h2>ChrismasMarket</h2>
+            <p>Estado de la compra #<?php echo htmlspecialchars($idCompra); ?></p>
         </div>
-      <?php endif; ?>
 
-      <?php if (!empty($total)): ?>
-        <p class="total">Total: $<?php echo htmlspecialchars($total); ?></p>
-      <?php endif; ?>
+        <p>Hola <?php echo htmlspecialchars($nombre ?? ''); ?>,</p>
+        <p>Te informamos que el estado de tu compra es: <strong><?php echo htmlspecialchars($estadoTexto ?? ''); ?></strong>.</p>
 
-      <p>Gracias por comprar en ChrismasMarket.</p>
-      <p>Saludos,<br/>Equipo ChrismasMarket</p>
+        <?php if (!empty($items) && is_array($items)): ?>
+            <div class="items">
+                <h4>Productos</h4>
+                <?php foreach ($items as $it): ?>
+                    <div class="item">
+                        <div><?php echo htmlspecialchars($it['nombre'] ?? $it[0] ?? ''); ?></div>
+                        <div>Cantidad: <?php echo htmlspecialchars($it['cantidad'] ?? $it[1] ?? '1'); ?></div>
+                        <div>Precio: <?php echo htmlspecialchars($it['precio'] ?? $it[2] ?? ''); ?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="total">Total: <?php echo htmlspecialchars($total ?? ''); ?></div>
+
+        <p>Fecha: <?php echo htmlspecialchars($fecha ?? date('Y-m-d H:i')); ?></p>
+
+        <p>Gracias por comprar en ChrismasMarket.</p>
     </div>
-  </div>
 </body>
 </html>
