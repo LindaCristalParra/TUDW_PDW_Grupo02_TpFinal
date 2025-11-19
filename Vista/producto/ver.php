@@ -21,7 +21,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             'prodetalle' => $p->getProDetalle(),
             'procantstock' => $p->getProCantStock(),
             'precio' => $p->getPrecio(),
-            'imagen' => $p->getImagen(),
+            'proimagen' => $p->getImagen(),
         ];
     }
 }
@@ -32,8 +32,8 @@ require_once __DIR__ . '/../Estructura/header.php';
     <?php if ($product): ?>
         <div class="row">
             <div class="col-md-6">
-                <?php if (!empty($product['imagen'])): ?>
-                    <img src="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/css/../img/<?= htmlspecialchars($product['imagen']) ?>" class="img-fluid" alt="<?= htmlspecialchars($product['pronombre']) ?>">
+                <?php if (!empty($product['proimagen'])): ?>
+                    <img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/<?= htmlspecialchars($product['proimagen']) ?>" class="img-fluid" alt="<?= htmlspecialchars($product['pronombre']) ?>">
                 <?php endif; ?>
             </div>
             <div class="col-md-6">
