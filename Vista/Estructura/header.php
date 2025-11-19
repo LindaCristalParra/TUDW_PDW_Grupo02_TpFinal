@@ -16,14 +16,20 @@
 				background: #ffffff;
 				border-bottom: 2px solid var(--header-red);
 			}
-			.site-navbar .navbar-brand, .site-navbar .nav-link {
+			.site-navbar .navbar-brand {
 				color: var(--pine-green) !important;
+				font-weight: 700;
+			}
+			.site-navbar .nav-link {
+				color: var(--pine-green) !important;
+				font-weight: 600;
 			}
 			.site-logo {
-				height: 80px;
+				height: 60px;
 				width: auto;
 				margin-right: 12px;
 			}
+			.nav-user-icon svg { height:30px; width: 30px; vertical-align:middle; }
 		</style>
 </head>
 <body>
@@ -58,7 +64,12 @@
 						echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'">'.htmlspecialchars($label).'</a></li>';
 					}
 				} else {
-					echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php">Login</a></li>';
+					// Mostrar icono de usuario para login
+					echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
+						. '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">'
+						. '<path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'
+						. '<path fill-rule="evenodd" d="M8 9a5 5 0 0 0-5 5 .5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5 5 5 0 0 0-5-5z"/>'
+						. '</svg></a></li>';
 				}
 				echo '</ul>';
 			} else {
