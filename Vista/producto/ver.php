@@ -1,8 +1,8 @@
 <?php
 // Vista/producto/ver.php - detalle público de producto
-require_once __DIR__ . '/../Control/Session.php';
-require_once __DIR__ . '/../Control/productoControl.php';
-require_once __DIR__ . '/../Control/menuControl.php';
+require_once __DIR__ . '/../../Control/Session.php';
+require_once __DIR__ . '/../../Control/productoControl.php';
+require_once __DIR__ . '/../../Control/menuControl.php';
 
 $session = new Session();
 $menuCtrl = new MenuControl();
