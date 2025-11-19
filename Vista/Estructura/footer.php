@@ -2,9 +2,12 @@
 // Vista/Estructura/footer.php
 ?>
 
-<footer class="text-center mt-4 mb-4">
-	<div class="container">
-		<small>&copy; <?php echo date('Y'); ?> ChrismasMarket</small>
+<footer class="text-center mt-4 mb-4" style="background:#ffffff;border-top:2px solid #dc3545;color:#01796F;">
+	<div class="container py-3 d-flex align-items-center">
+
+		<div class="mx-auto text-center w-100">
+			<small style="color:inherit">&copy; <?php echo date('Y'); ?> ChristmasMarket</small>
+		</div>
 	</div>
 </footer>
 

@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/Conector/BaseDatos.php';
+require_once __DIR__ . '/Compra.php';
+require_once __DIR__ . '/CompraEstadoTipo.php';
+
 class CompraEstado extends BaseDatos{
 
     //ver los diferentes estados de la compra y sus posibles contextos de cambio 
@@ -9,7 +13,7 @@ class CompraEstado extends BaseDatos{
     private $objcompraestadotipo;
     private $cefechaini; //CURRENT_TIMESTAMP
     private $cefechafin;
-    private $mensajeoperacion;
+    private $mensajeOperacion;
 
     public function __construct(){
         parent::__construct();
@@ -179,7 +183,7 @@ class CompraEstado extends BaseDatos{
     }
 
     public function getMensajeOperacion(){
-        return $this->mensajeoperacion;
+        return $this->mensajeOperacion;
     }
 
     //MÉTODOS SET
@@ -205,7 +209,7 @@ class CompraEstado extends BaseDatos{
         return $this;
     }
     public function setMensajeOperacion($newMensajeOperacion){
-        $this->mensajeoperacion=$newMensajeOperacion;
+        $this->mensajeOperacion=$newMensajeOperacion;
         return $this;
     }
 

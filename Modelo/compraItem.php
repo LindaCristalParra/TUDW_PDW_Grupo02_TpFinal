@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/Conector/BaseDatos.php';
 class CompraItem extends BaseDatos{
 
     //ver los diferentes estados de la compra y sus posibles contextos de cambio 

@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/Conector/BaseDatos.php';
 class Compra extends BaseDatos
 {
 

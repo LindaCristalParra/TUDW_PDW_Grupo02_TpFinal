@@ -7,14 +7,31 @@
 <head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>ChrismasMarket</title>
+		<title>ChristmasMarket</title>
 		<link href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/css/styles.css" rel="stylesheet">
+		<style>
+			:root { --pine-green: #01796F; --header-red: #dc3545; }
+			.site-navbar {
+				background: #ffffff;
+				border-bottom: 2px solid var(--header-red);
+			}
+			.site-navbar .navbar-brand, .site-navbar .nav-link {
+				color: var(--pine-green) !important;
+			}
+			.site-logo {
+				height: 80px;
+				width: auto;
+				margin-right: 12px;
+			}
+		</style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	<div class="container-fluid">
-		<a class="navbar-brand" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">ChrismasMarket</a>
+<nav class="navbar navbar-expand-lg site-navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">
+            <img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/logoTxt.png" alt="logo" class="site-logo" onerror="this.style.display='none'">
+        </a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
