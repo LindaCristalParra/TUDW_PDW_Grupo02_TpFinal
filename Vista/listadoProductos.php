@@ -14,7 +14,7 @@ $session = new Session();
 $logged = $session->sesionActiva();
 ?>
 <div class="container mt-4">
-    <h2>Listado de Productos</h2>
+    <h2>Productos</h2>
     <div class="row">
         <?php if (!empty($productos)) : ?>
             <?php foreach ($productos as $p) : ?>
