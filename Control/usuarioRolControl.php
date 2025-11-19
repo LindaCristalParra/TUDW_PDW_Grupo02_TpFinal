@@ -1,5 +1,7 @@
 <?php
-
+require_once __DIR__ . '/../Modelo/UsuarioRol.php';
+require_once __DIR__ . '/../Modelo/Usuario.php';
+require_once __DIR__ . '/../Modelo/Rol.php';
 class UsuarioRolControl
 {
 
