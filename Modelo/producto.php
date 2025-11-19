@@ -109,7 +109,7 @@ class Producto extends BaseDatos
         ."', procantstock='". $this->getProCantStock()
         ."', precio='". $this->getPrecio()
         ."', prodeshabilitado='". $this->getProDeshabilitado()
-        ."', proimagen='". $this->getImagen()
+        ."', imagen='". $this->getImagen()
         ."' WHERE idproducto='".$this->getID()."'";
         if ($this->Iniciar()) {
             if ($this->Ejecutar($sql)) {
@@ -153,7 +153,7 @@ class Producto extends BaseDatos
             if ($res>0) {
                 while ($row = $this->Registro()) {
                     $producto = new Producto();
-                    $producto->setear($row['idproducto'], $row['pronombre'], $row['prodetalle'], $row['procantstock'], $row['precio'], $row['prodeshabilitado'], $row['imagen']);
+                    $producto->setear($row['idproducto'], $row['pronombre'], $row['prodetalle'], $row['procantstock'], $row['precio'], $row['prodeshabilitado'], $row['proimagen']);
                     array_push($arreglo, $producto);
                 }
             }
