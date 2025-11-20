@@ -47,7 +47,11 @@ $isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolAct
                 <p class="fw-bold">Precio: $<?= number_format($product['precio'],2) ?></p>
                 <p>Stock: <?= intval($product['procantstock']) ?></p>
                 <?php if ($session->sesionActiva() && !$isAdmin): ?>
-                    <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarProdCarrito.php?idproducto=<?= $product['idproducto'] ?>" class="btn btn-primary">Agregar al carrito</a>
+                    <?php if (intval($product['procantstock']) > 0): ?>
+                        <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarProdCarrito.php?idproducto=<?= $product['idproducto'] ?>" class="btn btn-primary">Agregar al carrito</a>
+                    <?php else: ?>
+                        <button class="btn btn-secondary" disabled>Sin stock disponible</button>
+                    <?php endif; ?>
                 <?php elseif (!$session->sesionActiva()): ?>
                     <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" class="btn btn-outline-primary">Iniciar sesión para comprar</a>
                 <?php else: ?>

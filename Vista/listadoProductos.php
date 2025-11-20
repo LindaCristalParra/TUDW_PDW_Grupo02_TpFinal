@@ -33,7 +33,12 @@ $isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolAct
                             <p class="card-text">Precio: $<?php echo number_format($p->getPrecio(), 2); ?></p>
                             <p class="card-text">Stock: <?php echo intval($p->getProCantStock()); ?></p>
                             <?php if ($logged && !$isAdmin) : ?>
-                                <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarAlCarrito.php?idProducto=<?php echo urlencode($p->getID()); ?>" class="btn btn-primary">Agregar al carrito</a>
+                                <?php $stock = intval($p->getProCantStock()); ?>
+                                <?php if ($stock > 0) : ?>
+                                    <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarAlCarrito.php?idProducto=<?php echo urlencode($p->getID()); ?>" class="btn btn-primary">Agregar al carrito</a>
+                                <?php else : ?>
+                                    <button class="btn btn-secondary" disabled>Sin stock</button>
+                                <?php endif; ?>
                             <?php elseif (!$logged) : ?>
                                 <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" class="btn btn-secondary" title="Debe iniciar sesión para agregar productos">Iniciar sesión</a>
                             <?php else: ?>
