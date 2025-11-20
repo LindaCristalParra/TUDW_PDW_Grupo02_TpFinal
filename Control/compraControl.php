@@ -11,7 +11,7 @@ require_once __DIR__ . '/../Modelo/Conector/BaseDatos.php';
 // Cargar Carbon para manejo de fechas
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Carbon\Carbon; 
+use Carbon\Carbon;
 
 class CompraControl
 {
@@ -46,7 +46,7 @@ class CompraControl
     private function cargarObjeto($param)
     {
         $obj = null;
-        
+
         // 1. Verificamos si viene el ID de compra para cargar una existente o crear vacía
         if (array_key_exists('idcompra', $param) and $param['idcompra'] != null) {
             $obj = new Compra();
@@ -60,10 +60,10 @@ class CompraControl
 
         // 2. Asignamos el Usuario y la Fecha si el objeto es válido
         if ($obj != null) {
-            
+
             // LOGICA ROBUSTA PARA EL USUARIO
             $objUsuario = null;
-            
+
             // Caso A: Viene el objeto Usuario entero
             if (array_key_exists('objusuario', $param) && is_object($param['objusuario'])) {
                 $objUsuario = $param['objusuario'];
@@ -183,7 +183,7 @@ class CompraControl
                 $where .= " and idusuario ='" . $param['idusuario'] . "'";
             }
         }
-        $objC =  new Compra();
+        $objC = new Compra();
         $arreglo = $objC->listar($where);
         return $arreglo;
     }
@@ -196,11 +196,11 @@ class CompraControl
     public function listadoProdCarrito($carrito)
     {
         $arreglo = [];
-        
+
         if ($carrito != null) {
             $base = new BaseDatos();
             $idCompra = $carrito->getID();
-            
+
             // JOIN entre compraitem y producto para traer todo junto
             $sql = "SELECT 
                         ci.idcompraitem, 
@@ -221,12 +221,12 @@ class CompraControl
                         while ($row = $base->Registro()) {
                             $arreglo[] = [
                                 'idcompraitem' => $row['idcompraitem'],
-                                'cicantidad'   => $row['cicantidad'],
-                                'idproducto'   => $row['idproducto'],
-                                'pronombre'    => $row['pronombre'],
-                                'prodetalle'   => $row['prodetalle'],
-                                'precio'       => $row['precio'],      
-                                'proimagen'    => $row['proimagen']    
+                                'cicantidad' => $row['cicantidad'],
+                                'idproducto' => $row['idproducto'],
+                                'pronombre' => $row['pronombre'],
+                                'prodetalle' => $row['prodetalle'],
+                                'precio' => $row['precio'],
+                                'proimagen' => $row['proimagen']
                             ];
                         }
                     }
@@ -251,7 +251,7 @@ class CompraControl
             if ($respuesta) {
                 $respuesta = $this->sumarProdCarrito($carrito, $data);
             }
-        } else { 
+        } else {
             $carritoNuevo = $this->crearCarrito($idUserLogueado);
             if ($carritoNuevo <> null) {
                 $respuesta = $this->sumarProdCarrito($carritoNuevo, $data);
@@ -270,7 +270,7 @@ class CompraControl
             'idcompra' => $idCompra
         );
         $listaCompraItem = $objCompraItemControl->buscar($param);
-        if (count($listaCompraItem) > 0) { 
+        if (count($listaCompraItem) > 0) {
             $objCompraItemControl = $listaCompraItem[0];
             $idCI = $objCompraItemControl->getID();
             $cantidadCI = $objCompraItemControl->getCiCantidad();
@@ -285,7 +285,7 @@ class CompraControl
             if (!$respuesta) {
                 // echo "no se modifico";
             }
-        } else { 
+        } else {
             $data['idcompra'] = $idCompra;
             $respuesta = $objCompraItemControl->altaSinID($data);
         }
@@ -305,20 +305,20 @@ class CompraControl
         if (!$respuesta) {
             // echo "no se creo el carrito";
         }
-        if ($respuesta) { 
+        if ($respuesta) {
             $paramIDUsuario['idusuario'] = $idUser;
             $objCompraEstadoControl = new CompraEstadoControl();
             $listaCompras = $this->buscar($paramIDUsuario);
-            $posCompra = count($listaCompras) - 1; 
+            $posCompra = count($listaCompras) - 1;
             $idCompra = $listaCompras[$posCompra]->getID();
             $paramCompraEstado = array(
                 'idcompra' => $idCompra,
                 'idcompraestadotipo' => 5,
-                'cefechaini' => date('Y-m-d H:i:s'), 
+                'cefechaini' => date('Y-m-d H:i:s'),
                 'cefechafin' => '0000-00-00 00:00:00'
-            ); 
+            );
             $respuesta = $objCompraEstadoControl->altaSinID($paramCompraEstado);
-            if ($respuesta) { 
+            if ($respuesta) {
                 $carrito = $listaCompras[$posCompra];
             }
         }
@@ -326,7 +326,7 @@ class CompraControl
     }
 
     public function verificarStockProd($objCompraCarrito, $data)
-    { 
+    {
         $respuesta = false;
         $objCompraItemControl = new CompraItemControl();
         $idCompra = $objCompraCarrito->getID();
@@ -335,7 +335,7 @@ class CompraControl
             'idcompra' => $idCompra
         );
         $listaCompraItem = $objCompraItemControl->buscar($param);
-        if (count($listaCompraItem) > 0) { 
+        if (count($listaCompraItem) > 0) {
             $objCompraItemControl = $listaCompraItem[0];
             $nuevaCantCI = $objCompraItemControl->getCiCantidad() + 1;
             $objProductoControl = new ProductoControl();
@@ -347,7 +347,7 @@ class CompraControl
                     $respuesta = true;
                 }
             }
-        } else { 
+        } else {
             $respuesta = true;
         }
         return $respuesta;
@@ -357,7 +357,7 @@ class CompraControl
     {
         $respuesta = false;
         $objCompraEstadoControl = new CompraEstadoControl();
-        
+
         // Buscar el estado actual
         $list = $objCompraEstadoControl->buscar(['idcompraestado' => $data['idcompraestado']]);
 
@@ -365,13 +365,13 @@ class CompraControl
             $estadoActual = $list[0];
             date_default_timezone_set('America/Argentina/Buenos_Aires');
             $fechaFin = date('Y-m-d H:i:s');
-            
+
             // Paso 1: Cerrar el estado actual usando el objeto directamente
             $estadoActual->setCeFechaFin($fechaFin);
             $paso1 = $estadoActual->modificar();
-            
+
             error_log("Paso 1 - Cerrar estado actual: " . ($paso1 ? "OK" : "FALLO"));
-            
+
             if ($paso1) {
                 // Paso 2: Crear nuevo estado "cancelada"
                 $nuevoEstado = [
@@ -380,7 +380,7 @@ class CompraControl
                     'cefechaini' => $fechaFin,
                     'cefechafin' => null,
                 ];
-                
+
                 $respuesta = $objCompraEstadoControl->alta($nuevoEstado);
                 error_log("Paso 2 - Crear nuevo estado: " . ($respuesta ? "OK" : "FALLO"));
             }
@@ -405,10 +405,10 @@ class CompraControl
         error_log("Modificando estado actual: " . json_encode($arregloModCompra));
         $resp = $objCE->modificacion($arregloModCompra);
         error_log("Resultado modificación: " . ($resp ? "OK" : "FALLO"));
-        
+
         $res = false;
 
-        if ($resp) { 
+        if ($resp) {
             // Segundo: crear nuevo estado
             $arregloNewCompra = [
                 'idcompra' => $data['idcompra'],
@@ -433,17 +433,17 @@ class CompraControl
         return ($this->iniciarCompra($carrito));
     }
 
-   public function iniciarCompra($carrito)
+    public function iniciarCompra($carrito)
     {
         // Configurar Carbon con zona horaria
         $ahora = Carbon::now('America/Argentina/Buenos_Aires');
-        $fechaHoraActual = $ahora->toDateTimeString(); 
+        $fechaHoraActual = $ahora->toDateTimeString();
         $fechaCeros = '0000-00-00 00:00:00';
 
         $respuesta = false;
         $objCompraEstadoControl = new CompraEstadoControl();
         $idCompra = $carrito->getID();
-        
+
         // CERRAR EL ESTADO ANTERIOR (El carrito/borrador)
         // Buscamos los estados activos (fecha fin nula) de esta compra
         // Asumimos que el estado actual es 1 (Iniciada)
@@ -454,11 +454,11 @@ class CompraControl
 
         // Si no encuentra con ceros, busca con NULL por si acaso
         if (empty($estadosActivos)) {
-             $estadosActivos = $objCompraEstadoControl->buscar(['idcompra' => $idCompra]);
-             // Filtramos manualmente si vino null
-             $estadosActivos = array_filter($estadosActivos, function($e) {
-                 return $e->getCeFechaFin() == null;
-             });
+            $estadosActivos = $objCompraEstadoControl->buscar(['idcompra' => $idCompra]);
+            // Filtramos manualmente si vino null
+            $estadosActivos = array_filter($estadosActivos, function ($e) {
+                return $e->getCeFechaFin() == null;
+            });
         }
 
         foreach ($estadosActivos as $estadoAntiguo) {
@@ -474,7 +474,7 @@ class CompraControl
         }
 
         // Usamos ID 2.
-        $nuevoEstadoID = 2; 
+        $nuevoEstadoID = 2;
 
         $paramNuevoEstado = [
             'idcompra' => $idCompra,
@@ -491,7 +491,7 @@ class CompraControl
             try {
                 // Obtenemos el usuario para sacar el mail
                 $objUsuario = $carrito->getObjUsuario();
-                
+
                 // Si el objeto usuario viene vacío, lo recargamos
                 if ($objUsuario == null || $objUsuario->getUsMail() == null) {
                     $objUsuario = new Usuario();
@@ -554,14 +554,14 @@ class CompraControl
 
     public function listarCompras($idUsuario)
     {
-        $arreglo_salida =  [];
+        $arreglo_salida = [];
         $listaCompras = $this->buscar(['idusuario' => $idUsuario]);
         if (count($listaCompras) > 0) {
 
             foreach ($listaCompras as $elem) {
                 $objCompraEstadoControl = new CompraEstadoControl();
                 $listaCE = $objCompraEstadoControl->buscar(['idcompra' => $elem->getID()]);
-                
+
                 if (count($listaCE) > 0) {
                     $lastPosCE = count($listaCE) - 1;
                     if (!($listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion() === "carrito")) {
@@ -581,12 +581,34 @@ class CompraControl
         return $arreglo_salida;
     }
 
+    public function listarVentas()
+    {
+        $arreglo = [];
+        $objC = new Compra();
+        $arreglo = $objC->listar();
+        return $arreglo;
+        if (count($arreglo) > 0) {
+
+            foreach ($arreglo as $elem) {
+                $nuevoElem = [
+                    "idcompra" => $listaCE[$lastPosCE]->getObjCompra()->getID(),
+                    "cofecha" => $listaCE[$lastPosCE]->getCeFechaIni(),
+                    "finfecha" => $listaCE[$lastPosCE]->getCeFechaFin(),
+                    "estado" => $listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion(),
+                ];
+                array_push($arreglo_salida, $nuevoElem);
+            }
+        }
+        return $arreglo_salida;
+    }
+
     /**
      * Verifica si una compra puede ser cancelada (menos de 24 horas desde su creación)
      * @param string $fechaCompra Fecha de la compra en formato string
      * @return bool True si puede cancelarse, False en caso contrario
      */
-    public function puedeCancelarCompra($fechaCompra) {
+    public function puedeCancelarCompra($fechaCompra)
+    {
         $fecha = Carbon::parse($fechaCompra);
         $ahora = Carbon::now();
         $horasDiferencia = $fecha->diffInHours($ahora);
@@ -599,7 +621,8 @@ class CompraControl
      * @param int $diasEstimados Días estimados de entrega (por defecto 7)
      * @return string Fecha de entrega formateada
      */
-    public function fechaEntregaEstimada($fechaCompra, $diasEstimados = 7) {
+    public function fechaEntregaEstimada($fechaCompra, $diasEstimados = 7)
+    {
         return Carbon::parse($fechaCompra)->addDays($diasEstimados)->format('d/m/Y');
     }
 
@@ -608,7 +631,8 @@ class CompraControl
      * @param string $fechaCompra Fecha de la compra
      * @return bool True si es del último mes, False en caso contrario
      */
-    public function esDelUltimoMes($fechaCompra) {
+    public function esDelUltimoMes($fechaCompra)
+    {
         $fecha = Carbon::parse($fechaCompra);
         $unMesAtras = Carbon::now()->subMonth();
         return $fecha->isAfter($unMesAtras);
