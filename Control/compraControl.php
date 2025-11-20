@@ -357,14 +357,35 @@ class CompraControl
     {
         $respuesta = false;
         $objCompraEstadoControl = new CompraEstadoControl();
+        
+        // Buscar el estado actual
         $list = $objCompraEstadoControl->buscar(['idcompraestado' => $data['idcompraestado']]);
 
-        foreach ($list as $elem) { 
+        if (count($list) > 0) {
+            $estadoActual = $list[0];
             date_default_timezone_set('America/Argentina/Buenos_Aires');
-            $idCET = $elem->getObjCompraEstadoTipo()->getID(); 
-            $fechaIni = $elem->getCeFechaIni(); 
-            $fechaFin = date('Y-m-d H:i:s'); 
-            $respuesta = $this->cambiarEstado($data, $idCET, $fechaIni, $fechaFin, $objCompraEstadoControl);
+            $fechaFin = date('Y-m-d H:i:s');
+            
+            // Paso 1: Cerrar el estado actual usando el objeto directamente
+            $estadoActual->setCeFechaFin($fechaFin);
+            $paso1 = $estadoActual->modificar();
+            
+            error_log("Paso 1 - Cerrar estado actual: " . ($paso1 ? "OK" : "FALLO"));
+            
+            if ($paso1) {
+                // Paso 2: Crear nuevo estado "cancelada"
+                $nuevoEstado = [
+                    'idcompra' => $data['idcompra'],
+                    'idcompraestadotipo' => 4, // ID de "cancelada"
+                    'cefechaini' => $fechaFin,
+                    'cefechafin' => null,
+                ];
+                
+                $respuesta = $objCompraEstadoControl->alta($nuevoEstado);
+                error_log("Paso 2 - Crear nuevo estado: " . ($respuesta ? "OK" : "FALLO"));
+            }
+        } else {
+            error_log("ERROR: No se encontró el estado de compra con ID: " . $data['idcompraestado']);
         }
 
         return $respuesta;
@@ -372,6 +393,7 @@ class CompraControl
 
     public function cambiarEstado($data, $idCET, $fechaIni, $fechaFin, $objCE)
     {
+        // Primero: cerrar el estado actual
         $arregloModCompra = [
             'idcompraestado' => $data['idcompraestado'],
             'idcompra' => $data['idcompra'],
@@ -380,9 +402,14 @@ class CompraControl
             'cefechafin' => $fechaFin,
         ];
 
+        error_log("Modificando estado actual: " . json_encode($arregloModCompra));
         $resp = $objCE->modificacion($arregloModCompra);
+        error_log("Resultado modificación: " . ($resp ? "OK" : "FALLO"));
+        
+        $res = false;
 
         if ($resp) { 
+            // Segundo: crear nuevo estado
             $arregloNewCompra = [
                 'idcompra' => $data['idcompra'],
                 'idcompraestadotipo' => $data['idcompraestadotipo'],
@@ -390,7 +417,9 @@ class CompraControl
                 'cefechafin' => null,
             ];
 
+            error_log("Creando nuevo estado: " . json_encode($arregloNewCompra));
             $res = $objCE->altaSinID($arregloNewCompra);
+            error_log("Resultado alta: " . ($res ? "OK" : "FALLO"));
         }
         return $res;
     }

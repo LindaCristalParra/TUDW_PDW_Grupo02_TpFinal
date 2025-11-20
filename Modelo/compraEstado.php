@@ -102,14 +102,22 @@ class CompraEstado extends BaseDatos{
         ."', cefechaini='".$this->getCeFechaIni()
         ."', cefechafin='".$this->getCeFechaFin()
         ."' WHERE idcompraestado='".$this->getID()."'";
+        
+        error_log("SQL Modificar: " . $sql);
+        
         if ($this->Iniciar()) {
             if ($this->Ejecutar($sql)) {
                 $resp = true;
+                error_log("Modificación ejecutada correctamente");
             } else {
-                $this->setMensajeOperacion("compraestado->modificar: ".$this->getError());
+                $errorMsg = "compraestado->modificar: ".$this->getError();
+                $this->setMensajeOperacion($errorMsg);
+                error_log("ERROR en modificar: " . $errorMsg);
             }
         } else {
-            $this->setMensajeOperacion("compraestado->modificar: ".$this->getError());
+            $errorMsg = "compraestado->modificar: ".$this->getError();
+            $this->setMensajeOperacion($errorMsg);
+            error_log("ERROR al iniciar conexión: " . $errorMsg);
         }
         return $resp;
     }

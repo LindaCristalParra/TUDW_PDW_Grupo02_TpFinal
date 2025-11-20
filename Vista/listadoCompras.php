@@ -31,24 +31,53 @@ if (!$session->sesionActiva()) {
 
 $idUsuario = $session->getIDUsuarioLogueado();
 $compraCtrl = new CompraControl();
-$compras = $compraCtrl->listarCompras($idUsuario);
+
+$mensaje = '';
+$tipoMensaje = '';
+$debugInfo = '';
 
 // Cancelar compra por POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancelar_id']) && isset($_POST['cancelar_estado'])) {
     $idCompra = $_POST['cancelar_id'];
     $idCompraEstado = $_POST['cancelar_estado'];
+    
+    // Habilitar captura de errores
+    ob_start();
+    
     // Estado 4 = cancelada
-    $compraCtrl->cancelarCompra([
+    $resultado = $compraCtrl->cancelarCompra([
         'idcompra' => $idCompra,
         'idcompraestado' => $idCompraEstado,
         'idcompraestadotipo' => 4
     ]);
-    header('Location: listadoCompras.php');
-    exit;
+    
+    $debugInfo = ob_get_clean();
+    
+    if ($resultado) {
+        $mensaje = 'Compra cancelada exitosamente.';
+        $tipoMensaje = 'success';
+    } else {
+        $mensaje = 'Error al cancelar la compra. Por favor, intente nuevamente.';
+        $tipoMensaje = 'danger';
+        // Agregar info de debug si está disponible
+        if (!empty($debugInfo)) {
+            $mensaje .= '<br><small>Debug: ' . htmlspecialchars($debugInfo) . '</small>';
+        }
+    }
 }
+
+$compras = $compraCtrl->listarCompras($idUsuario);
 ?>
 <div class="container mt-4">
     <h2>Mis Compras</h2>
+    
+    <?php if (!empty($mensaje)) : ?>
+        <div class="alert alert-<?php echo $tipoMensaje; ?> alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($mensaje); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    
     <?php if (!empty($compras)) : ?>
         <table class="table table-striped">
             <thead>
