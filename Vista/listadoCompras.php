@@ -14,7 +14,11 @@ use Carbon\Carbon;
  */
 function formatearFechaCompra($fechaBD) {
     Carbon::setLocale('es');
-    $fecha = Carbon::parse($fechaBD);
+    
+    // Parsear la fecha desde la BD (asumiendo que viene en la zona horaria del servidor)
+    // y convertirla a la zona horaria de Argentina
+    $fecha = Carbon::parse($fechaBD)->timezone('America/Argentina/Buenos_Aires');
+    
     return $fecha->format('d/m/Y H:i') . ' (' . $fecha->diffForHumans() . ')';
 }
 
