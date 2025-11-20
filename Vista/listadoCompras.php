@@ -123,7 +123,7 @@ $compras = $compraCtrl->listarCompras($idUsuario);
                             <span class="badge bg-<?php echo $estadoBadge; ?>"><?php echo htmlspecialchars($c['estado'] ?? ''); ?></span>
                         </td>
                         <td>
-                            <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/compra/ver.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-outline-primary">Ver</a>
+                             <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/verCompra.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-outline-primary">Ver</a>
                             <?php if (strtolower($c['estado']) !== 'enviado' && strtolower($c['estado']) !== 'cancelada') : ?>
                                 <?php if ($puedeCancelar) : ?>
                                     <form method="post" style="display:inline;">
