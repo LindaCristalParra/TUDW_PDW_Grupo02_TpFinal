@@ -21,9 +21,14 @@ $badgeColor = $coloresEstado[$idEstadoTipo] ?? 'bg-info';
         <h2 style="color:var(--pine-green);">
             <i class="bi bi-receipt"></i> Detalle de Compra #<?php echo $objCompra->getID(); ?>
         </h2>
-        <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/listado.php" class="btn btn-outline-secondary">
-            &larr; Volver a Mis Compras
-        </a>
+        <div>
+            <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/descargarPDF.php?id=<?php echo $objCompra->getID(); ?>" class="btn btn-danger me-2">
+                <i class="bi bi-file-pdf"></i> Descargar PDF
+            </a>
+            <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/listado.php" class="btn btn-outline-secondary">
+                &larr; Volver a Mis Compras
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm mb-4 border-top-0 border-start-0 border-end-0 border-bottom-0" style="border-left: 5px solid var(--pine-green) !important;">
