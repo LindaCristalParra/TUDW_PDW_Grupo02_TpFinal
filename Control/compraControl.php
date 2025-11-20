@@ -383,6 +383,58 @@ class CompraControl
 
                 $respuesta = $objCompraEstadoControl->alta($nuevoEstado);
                 error_log("Paso 2 - Crear nuevo estado: " . ($respuesta ? "OK" : "FALLO"));
+                
+                // Paso 3: Enviar email de cancelación
+                if ($respuesta) {
+                    try {
+                        $compraCtrl = new CompraControl();
+                        $listaCompras = $compraCtrl->buscar(['idcompra' => $data['idcompra']]);
+                        
+                        if (!empty($listaCompras)) {
+                            $objCompra = $listaCompras[0];
+                            $objUsuario = $objCompra->getObjUsuario();
+                            
+                            if ($objUsuario && $objUsuario->getUsMail()) {
+                                $email = $objUsuario->getUsMail();
+                                
+                                // Obtener items de la compra para el email
+                                $productos = $compraCtrl->listadoProdCarrito($objCompra);
+                                $itemsParaMail = [];
+                                $total = 0;
+                                
+                                foreach ($productos as $p) {
+                                    $precio = floatval($p['precio']);
+                                    $cantidad = intval($p['cicantidad']);
+                                    $subtotal = $precio * $cantidad;
+                                    $total += $subtotal;
+                                    
+                                    $itemsParaMail[] = [
+                                        'nombre' => $p['pronombre'],
+                                        'cantidad' => $cantidad,
+                                        'precio' => $precio,
+                                        'subtotal' => $subtotal
+                                    ];
+                                }
+                                
+                                $totalFormateado = '$' . number_format($total, 2, ',', '.');
+                                
+                                if (class_exists('EmailService')) {
+                                    $datosExtra = [
+                                        'nombre' => $objUsuario->getUsNombre(),
+                                        'fecha' => date('d/m/Y H:i'),
+                                        'items' => $itemsParaMail,
+                                        'total' => $totalFormateado
+                                    ];
+                                    
+                                    EmailService::enviarEstadoCompra($email, $data['idcompra'], 4, $datosExtra);
+                                    error_log("Email de cancelación enviado a: " . $email);
+                                }
+                            }
+                        }
+                    } catch (Exception $e) {
+                        error_log("Error al enviar email de cancelación: " . $e->getMessage());
+                    }
+                }
             }
         } else {
             error_log("ERROR: No se encontró el estado de compra con ID: " . $data['idcompraestado']);
