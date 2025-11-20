@@ -110,4 +110,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancelar_id']) && iss
     <?php endif; ?>
 </div>
 
-<?php require_once __DIR__ . '/../Estructura/footer.php'; ?>
+<?php require_once __DIR__ . '/Estructura/footer.php'; ?>
