@@ -37,6 +37,10 @@ if ($session->sesionActiva()) {
     foreach ($anon as $q) { $cartCount += intval($q); }
 }
 
+// Determinar si el usuario es administrador (para mostrar link en el nav)
+$rolActivo = $session->getRolActivo();
+$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
+
 ?>
 
 <!doctype html>
@@ -113,20 +117,26 @@ if ($session->sesionActiva()) {
 
                 }
 
+                // Mostrar Panel en el left nav si es administrador
+                if (!empty($isAdmin)) {
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                }
+
                 echo '</ul>';
                 echo '<ul class="navbar-nav">';
 
-                // icono del carrito (siempre visible)
-                $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
-                echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
-				. '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">'
-    			. '';
+                // icono del carrito (oculto para administradores)
+                if (empty($isAdmin)) {
+                    $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
+                    echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
+                        . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">';
 
-                if ($cartCount > 0) {
-                    echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
+                    if ($cartCount > 0) {
+                        echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
+                    }
+
+                    echo '</a></li>';
                 }
-
-                echo '</a></li>';
 
                 if (!empty($menuData['right'])) {
 
@@ -152,13 +162,18 @@ if ($session->sesionActiva()) {
 
                 } else {
 
-                    // Mostrar icono de usuario para login
-
-                    echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
-                        . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogin.png" alt="Usuario" style="width: 24px; height: 24px;">'
-						. '';
-
-						echo '</a></li>';
+                    // Si no hay items en menuData['right']:
+                    // Mostrar logout si hay sesión, sino login
+                    if ($session->sesionActiva()) {
+                        $logoutUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php';
+                        echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="'.htmlspecialchars($logoutUrl).'" aria-label="Cerrar sesión">'
+                            . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogout.png" alt="Cerrar sesión" style="width: 24px; height: 24px;">'
+                            . '</a></li>';
+                    } else {
+                        echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
+                            . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogin.png" alt="Usuario" style="width: 24px; height: 24px;">'
+                            . '</a></li>';
+                    }
                 }
 
                 echo '</ul>';
@@ -173,6 +188,10 @@ if ($session->sesionActiva()) {
                 // Link público a Productos
 
                 echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php">Productos</a></li>';
+                // Mostrar Panel incluso en el fallback cuando el usuario es administrador
+                if (!empty($isAdmin)) {
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                }
                 echo '</ul>';
 
                 // carrito

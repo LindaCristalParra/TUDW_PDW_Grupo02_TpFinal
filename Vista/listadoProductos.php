@@ -13,6 +13,9 @@ require_once __DIR__ . '/../Util/funciones.php';
 require_once __DIR__ . '/../Control/Session.php';
 $session = new Session();
 $logged = $session->sesionActiva();
+// Determinar rol activo para ocultar acciones a administradores
+$rolActivo = $session->getRolActivo();
+$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
 ?>
 <div class="container mt-4">
     <h2>Productos</h2>
@@ -29,10 +32,12 @@ $logged = $session->sesionActiva();
                             <h5 class="card-title"><?php echo htmlspecialchars($p->getProNombre()); ?></h5>
                             <p class="card-text">Precio: $<?php echo number_format($p->getPrecio(), 2); ?></p>
                             <p class="card-text">Stock: <?php echo intval($p->getProCantStock()); ?></p>
-                            <?php if ($logged) : ?>
+                            <?php if ($logged && !$isAdmin) : ?>
                                 <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarProdCarrito.php?idproducto=<?php echo urlencode($p->getID()); ?>" class="btn btn-primary">Agregar al carrito</a>
-                            <?php else: ?>
+                            <?php elseif (!$logged) : ?>
                                 <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" class="btn btn-secondary" title="Debe iniciar sesión para agregar productos">Iniciar sesión</a>
+                            <?php else: ?>
+                                <!-- Administrador: no mostrar botón de carrito -->
                             <?php endif; ?>
                         </div>
                     </div>
