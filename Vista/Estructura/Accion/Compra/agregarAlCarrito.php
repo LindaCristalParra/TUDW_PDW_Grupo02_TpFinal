@@ -33,7 +33,7 @@ if (empty($idUsuario)) {
     exit;
 }
 
-// 3. OBTENER PRODUCTO
+// OBTENER PRODUCTO
 $idProducto = $_GET['idProducto'] ?? ($_POST['idProducto'] ?? null);
 
 if (!$idProducto) {
@@ -41,8 +41,8 @@ if (!$idProducto) {
     exit;
 }
 
-// 4. BUSCAR CARRITO ACTIVO (LA SOLUCIÓN DEFINITIVA)
-// Usamos UsuarioControl porque ya arreglamos su lógica SQL
+// BUSCAR CARRITO ACTIVO 
+
 $uControl = new UsuarioControl();
 $carritoObj = $uControl->obtenerCarrito($idUsuario);
 
@@ -56,7 +56,7 @@ if ($carritoObj != null) {
     // ¡Ya existe un carrito activo! Lo usamos.
     $idCompraActiva = $carritoObj->getID();
 } else {
-    // No existe, creamos uno nuevo (Solo debería pasar 1 vez)
+    // No existe, creamos uno nuevo 
     if ($abmCompra->alta(['idusuario' => $idUsuario])) {
         $compras = $abmCompra->buscar(['idusuario' => $idUsuario]);
         $ultimaCompra = end($compras);
@@ -74,7 +74,7 @@ if ($carritoObj != null) {
     }
 }
 
-// 5. GESTIONAR EL ITEM
+// GESTIONAR EL ITEM
 $itemsEnCarrito = $abmItem->buscar([
     'idcompra' => $idCompraActiva,
     'idproducto' => $idProducto
