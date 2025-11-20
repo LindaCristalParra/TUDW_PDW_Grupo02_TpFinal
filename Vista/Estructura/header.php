@@ -25,8 +25,8 @@ if ($session->sesionActiva()) {
     $carrito = $usuarioCtrl->obtenerCarrito($idUser);
 
     if ($carrito) {
-        $productos = $compraCtrl->listadoProdCarrito($carrito);
-        foreach ($productos as $p) {
+        $cartProducts = $compraCtrl->listadoProdCarrito($carrito);
+        foreach ($cartProducts as $p) {
             $cartCount += intval($p['cicantidad'] ?? 0);
         }
 
