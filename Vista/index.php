@@ -20,7 +20,6 @@ require_once __DIR__ . '/Estructura/header.php';
             <div class="mt-4">
                 <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php" class="btn btn-lg me-2" style="background: var(--pine-green); border-color: var(--pine-green); color: #ffffff;">Ver productos</a>
             </div>
-            <p class="text-muted small mt-3">Gracias por apoyar a las tiendas locales. ¡Felices fiestas!</p>
         </div>
     </div>
 </div>

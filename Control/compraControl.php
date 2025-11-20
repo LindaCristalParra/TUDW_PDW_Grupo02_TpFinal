@@ -435,94 +435,112 @@ class CompraControl
 
     public function iniciarCompra($carrito)
     {
-        // Configurar Carbon con zona horaria
-        $ahora = Carbon::now('America/Argentina/Buenos_Aires');
-        $fechaHoraActual = $ahora->toDateTimeString();
+        // Configuración de Fecha
+        date_default_timezone_set('America/Argentina/Buenos_Aires');
+        $fechaHoraActual = date('Y-m-d H:i:s');
         $fechaCeros = '0000-00-00 00:00:00';
 
         $respuesta = false;
         $objCompraEstadoControl = new CompraEstadoControl();
         $idCompra = $carrito->getID();
+        
+        // Preparar datos para el email
+        $itemsParaMail = [];
+        $totalCompra = 0;
 
-        // CERRAR EL ESTADO ANTERIOR (El carrito/borrador)
-        // Buscamos los estados activos (fecha fin nula) de esta compra
-        // Asumimos que el estado actual es 1 (Iniciada)
+        // Reutilizamos la función listar productos
+        $listaProductos = $this->listadoProdCarrito($carrito);
+
+        foreach ($listaProductos as $prod) {
+            $precioUnitario = floatval($prod['precio']);
+            $cantidad = intval($prod['cicantidad']);
+            $subtotal = $precioUnitario * $cantidad;
+            $totalCompra += $subtotal;
+
+            // Armamos el array 
+            $itemsParaMail[] = [
+                'nombre' => $prod['pronombre'],
+                'cantidad' => $cantidad,
+                'precio' => '$' . number_format($precioUnitario, 2, ',', '.')
+            ];
+        }
+        
+        $totalFormateado = '$' . number_format($totalCompra, 2, ',', '.');
+       
+
+
+        // CERRAR ESTADOS ANTERIORES
         $estadosActivos = $objCompraEstadoControl->buscar([
             'idcompra' => $idCompra,
-            'cefechafin' => $fechaCeros // Buscamos los que no han terminado
+            'cefechafin' => $fechaCeros 
         ]);
 
-        // Si no encuentra con ceros, busca con NULL por si acaso
         if (empty($estadosActivos)) {
-            $estadosActivos = $objCompraEstadoControl->buscar(['idcompra' => $idCompra]);
-            // Filtramos manualmente si vino null
-            $estadosActivos = array_filter($estadosActivos, function ($e) {
-                return $e->getCeFechaFin() == null;
-            });
+             $todosLosEstados = $objCompraEstadoControl->buscar(['idcompra' => $idCompra]);
+             foreach ($todosLosEstados as $e) {
+                 if ($e->getCeFechaFin() == null) {
+                     $estadosActivos[] = $e;
+                 }
+             }
         }
 
         foreach ($estadosActivos as $estadoAntiguo) {
-            // Cerramos el estado poniéndole fecha fin "Ahora"
             $paramCierre = [
                 'idcompraestado' => $estadoAntiguo->getID(),
                 'idcompra' => $idCompra,
                 'idcompraestadotipo' => $estadoAntiguo->getObjCompraEstadoTipo()->getID(),
                 'cefechaini' => $estadoAntiguo->getCeFechaIni(),
-                'cefechafin' => $fechaHoraActual // <--- Carbon Time
+                'cefechafin' => $fechaHoraActual
             ];
             $objCompraEstadoControl->modificacion($paramCierre);
         }
 
-        // Usamos ID 2.
-        $nuevoEstadoID = 2;
+        // CREAR NUEVO ESTADO
+        $nuevoEstadoID = 2; 
 
         $paramNuevoEstado = [
             'idcompra' => $idCompra,
             'idcompraestadotipo' => $nuevoEstadoID,
-            'cefechaini' => $fechaHoraActual, // <--- Carbon Time
+            'cefechaini' => $fechaHoraActual,
             'cefechafin' => $fechaCeros
         ];
 
-        // Usamos alta() que es más robusto en tu nuevo control
+        // Guardamos
         if ($objCompraEstadoControl->alta($paramNuevoEstado)) {
             $respuesta = true;
 
-            // ENVIAR EMAIL 
+            //  ENVIAR EMAIL CON LOS DATOS REALES
             try {
-                // Obtenemos el usuario para sacar el mail
                 $objUsuario = $carrito->getObjUsuario();
-
-                // Si el objeto usuario viene vacío, lo recargamos
                 if ($objUsuario == null || $objUsuario->getUsMail() == null) {
                     $objUsuario = new Usuario();
                     $objUsuario->setID($carrito->getObjUsuario()->getID());
                     $objUsuario->cargar();
                 }
+                
+                $email = $objUsuario->getUsMail();
+                
+                // Verificamos si la clase existe para no romper si falta el mailer
+                if (!empty($email) && class_exists('EmailService')) {
+                     
+                     // Datos 
+                     $datosExtra = [
+                        'nombre' => $objUsuario->getUsNombre(),
+                        'fecha' => date('d/m/Y H:i'),
+                        'items' => $itemsParaMail,  
+                        'total' => $totalFormateado 
+                     ];
 
-                $emailDestino = $objUsuario->getUsMail();
-                $nombreUsuario = $objUsuario->getUsNombre();
-
-                if ($emailDestino) {
-                    // Datos extra para la plantilla del mail
-                    $datosExtra = [
-                        'nombre' => $nombreUsuario,
-                        'fecha' => $ahora->format('d/m/Y H:i'), // Formato bonito para el humano
-                        'total' => '---' // (Opcional: calcular total aquí si quieres)
-                    ];
-
-                    // Llamada estática a tu EmailService
-                    // Parámetros: (Destinatario, ID Compra, ID Estado Nuevo, Extras)
-                    EmailService::enviarEstadoCompra($emailDestino, $idCompra, $nuevoEstadoID, $datosExtra);
+                     EmailService::enviarEstadoCompra($email, $idCompra, $nuevoEstadoID, $datosExtra);
                 }
-
             } catch (Exception $e) {
-                // Logueamos el error pero no detenemos la compra
-                error_log("Error enviando mail en iniciarCompra: " . $e->getMessage());
+                // Silenciamos error de mail
             }
         }
 
-        return ['idcompra' => $idCompra, 'respuesta' => $respuesta];
+        return $respuesta;
     }
+
 
     public function vaciarCarrito($idCarrito)
     {
