@@ -507,19 +507,23 @@ class CompraControl
             foreach ($listaCompras as $elem) {
                 $objCompraEstadoControl = new CompraEstadoControl();
                 $listaCE = $objCompraEstadoControl->buscar(['idcompra' => $elem->getID()]);
-                $lastPosCE = count($listaCE) - 1;
-                //RECORREMOS EL LISTADO DE COMPRAS ESTADO Y SOLO MOSTRAMOS LA ULTIMA CE
-                //SI ES CARRITO NO LO MOSTRAMOS
-                if (!($listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion() === "carrito")) {
-                    $nuevoElem = [
-                        "idcompra" => $listaCE[$lastPosCE]->getObjCompra()->getID(),
-                        "cofecha" => $listaCE[$lastPosCE]->getCeFechaIni(),
-                        "finfecha" => $listaCE[$lastPosCE]->getCeFechaFin(),
-                        "usnombre" => $listaCE[$lastPosCE]->getObjCompra()->getObjUsuario()->getUsNombre(),
-                        "estado" => $listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion(),
-                        "idcompraestado" => $listaCE[$lastPosCE]->getID()
-                    ];
-                    array_push($arreglo_salida, $nuevoElem);
+                
+                // Verificar que la lista de estados no esté vacía
+                if (count($listaCE) > 0) {
+                    $lastPosCE = count($listaCE) - 1;
+                    //RECORREMOS EL LISTADO DE COMPRAS ESTADO Y SOLO MOSTRAMOS LA ULTIMA CE
+                    //SI ES CARRITO NO LO MOSTRAMOS
+                    if (!($listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion() === "carrito")) {
+                        $nuevoElem = [
+                            "idcompra" => $listaCE[$lastPosCE]->getObjCompra()->getID(),
+                            "cofecha" => $listaCE[$lastPosCE]->getCeFechaIni(),
+                            "finfecha" => $listaCE[$lastPosCE]->getCeFechaFin(),
+                            "usnombre" => $listaCE[$lastPosCE]->getObjCompra()->getObjUsuario()->getUsNombre(),
+                            "estado" => $listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion(),
+                            "idcompraestado" => $listaCE[$lastPosCE]->getID()
+                        ];
+                        array_push($arreglo_salida, $nuevoElem);
+                    }
                 }
             }
         }
