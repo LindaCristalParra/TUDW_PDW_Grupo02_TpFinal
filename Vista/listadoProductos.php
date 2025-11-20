@@ -20,7 +20,7 @@ $logged = $session->sesionActiva();
         <?php if (!empty($productos)) : ?>
             <?php foreach ($productos as $p) : ?>
                 <div class="col-md-4 mb-3">
-                    <div class="card">
+                    <div class="card" style="box-shadow: 0 4px 16px rgba(0,0,0,0.12); border-radius: 12px; padding: 8px;">
                         <?php if (method_exists($p, 'getImagen') && $p->getImagen()) : ?>
                             <?php $imgSrc = img_public_url($p->getImagen()); ?>
                             <img src="<?php echo htmlspecialchars($imgSrc); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($p->getProNombre()); ?>">
