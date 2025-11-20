@@ -1,4 +1,7 @@
 <?php
+// Configurar zona horaria para toda la aplicación
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+
 class BaseDatos extends PDO
 {
 

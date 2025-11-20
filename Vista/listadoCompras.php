@@ -1,5 +1,8 @@
 
 <?php
+// Configurar zona horaria de Argentina para toda la aplicación
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+
 require_once __DIR__ . '/Estructura/header.php';
 require_once __DIR__ . '/../Control/Session.php';
 require_once __DIR__ . '/../Control/compraControl.php';
@@ -15,9 +18,8 @@ use Carbon\Carbon;
 function formatearFechaCompra($fechaBD) {
     Carbon::setLocale('es');
     
-    // Parsear la fecha desde la BD (asumiendo que viene en la zona horaria del servidor)
-    // y convertirla a la zona horaria de Argentina
-    $fecha = Carbon::parse($fechaBD)->timezone('America/Argentina/Buenos_Aires');
+    // Parsear la fecha directamente (ya en hora de Argentina)
+    $fecha = Carbon::parse($fechaBD);
     
     return $fecha->format('d/m/Y H:i') . ' (' . $fecha->diffForHumans() . ')';
 }

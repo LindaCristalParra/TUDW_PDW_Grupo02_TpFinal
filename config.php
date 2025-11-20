@@ -1,4 +1,7 @@
 <?php
+// Configurar zona horaria para toda la aplicación
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+
 include_once __DIR__ . '/confidencial.php';
 // Config global del proyecto
 // Rutas para imágenes: ruta en filesystem y prefijo web público
