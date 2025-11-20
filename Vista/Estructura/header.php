@@ -98,72 +98,129 @@ $isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolAct
         <div class="collapse navbar-collapse" id="navbarNav">
 
             <?php
-            // Normalize $menuData
-            if (!isset($menuData) || !is_array($menuData)) {
-                $menuData = [];
-            }
 
-            // Left nav
-            echo '<ul class="navbar-nav me-auto mb-2 mb-lg-0">';
-            if (!empty($menuData['left']) && is_array($menuData['left'])) {
-                foreach ($menuData['left'] as $item) {
-                    $u = isset($item['url']) ? $item['url'] : '#';
-                    $l = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Item');
-                    echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($u).'">'.htmlspecialchars($l).'</a></li>';
-                }
-            } else {
+            // El header no debe decidir rutas ni roles: el action debe preparar $menuData.
+            // Estructura esperada: $menuData = ['left'=> [ ['url'=>'...','label'=>'...'], ... ], 'right'=>[...] ]
+
+            if (isset($menuData) && is_array($menuData)) {
+                echo '<ul class="navbar-nav me-auto mb-2 mb-lg-0">';
+                // Link público a Inicio y Productos (siempre visibles)
                 echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">Inicio</a></li>';
-                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/listadoProductos.php">Productos</a></li>';
-            }
+                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php">Productos</a></li>';
 
-            if (!empty($isAdmin)) {
-                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
-            }
-            echo '</ul>';
+                if (!empty($menuData['left'])) {
+                    foreach ($menuData['left'] as $item) {
+                        $url = isset($item['url']) ? $item['url'] : '#';
+                        $label = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Menu');
+                        echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'">'.htmlspecialchars($label).'</a></li>';
+                    }
 
-            // Right nav (cart hidden for admin)
-            echo '<ul class="navbar-nav">';
-            if (empty($isAdmin)) {
+                }
+
+                // Mostrar Panel en el left nav si es administrador
+                if (!empty($isAdmin)) {
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                }
+
+                echo '</ul>';
+                echo '<ul class="navbar-nav">';
+
+                // icono del carrito (oculto para administradores)
+                if (empty($isAdmin)) {
+                    $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
+                    echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
+                        . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">';
+
+                    if ($cartCount > 0) {
+                        echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
+                    }
+
+                    echo '</a></li>';
+                }
+
+                if (!empty($menuData['right'])) {
+
+                    foreach ($menuData['right'] as $item) {
+                        $url = isset($item['url']) ? $item['url'] : '#';
+                        $label = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Accion');
+                        $icon = isset($item['icon']) ? $item['icon'] : '';
+                        $iconOnly = isset($item['icon_only']) && $item['icon_only'];
+
+                        if ($iconOnly && !empty($icon)) {
+                            // mostrar solo el icono (con aria-label para accesibilidad)
+                            echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'" aria-label="'.htmlspecialchars($label).'">'
+                                . '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt="'.htmlspecialchars($label).'">'
+                                . '</a></li>';
+                        } else {
+                            $iconHtml = '';
+                            if (!empty($icon)) {
+                                $iconHtml = '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt=""> ';
+                            }
+                            echo '<li class="nav-item"><a class="nav-link d-flex align-items-center" href="'.htmlspecialchars($url).'">'.$iconHtml.htmlspecialchars($label).'</a></li>';
+                        }
+                    }
+
+                } else {
+
+                    // Si no hay items en menuData['right']:
+                    // Mostrar logout si hay sesión, sino login
+                    if ($session->sesionActiva()) {
+                        $logoutUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php';
+                        echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="'.htmlspecialchars($logoutUrl).'" aria-label="Cerrar sesión">'
+                            . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogout.png" alt="Cerrar sesión" style="width: 24px; height: 24px;">'
+                            . '</a></li>';
+                    } else {
+                        echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
+                            . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogin.png" alt="Usuario" style="width: 24px; height: 24px;">'
+                            . '</a></li>';
+                    }
+                }
+
+                echo '</ul>';
+
+            } else {
+
+                // fallback mínimo: Inicio + carrito + Login (iconos)
+
+                echo '<ul class="navbar-nav me-auto mb-2 mb-lg-0">';
+                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">Inicio</a></li>';
+
+                // Link público a Productos
+
+                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php">Productos</a></li>';
+                // Mostrar Panel incluso en el fallback cuando el usuario es administrador
+                if (!empty($isAdmin)) {
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                }
+                echo '</ul>';
+
+                // carrito
+
                 $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
+                echo '<ul class="navbar-nav">';
                 echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
-                    . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">';
+               . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">'
+    			. '';
 
                 if ($cartCount > 0) {
+
                     echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
+
                 }
 
                 echo '</a></li>';
-            }
 
-            if (!empty($menuData['right']) && is_array($menuData['right'])) {
-                foreach ($menuData['right'] as $item) {
-                    $url = isset($item['url']) ? $item['url'] : '#';
-                    $label = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Accion');
-                    $icon = isset($item['icon']) ? $item['icon'] : '';
-                    $iconOnly = isset($item['icon_only']) && $item['icon_only'];
+                // login icon
 
-                    if ($iconOnly && !empty($icon)) {
-                        echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'" aria-label="'.htmlspecialchars($label).'">'
-                            . '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt="'.htmlspecialchars($label).'">'
-                            . '</a></li>';
-                    } else {
-                        $iconHtml = '';
-                        if (!empty($icon)) $iconHtml = '<img src="'.htmlspecialchars($icon).'" class="menu-icon" alt=""> ';
-                        echo '<li class="nav-item"><a class="nav-link d-flex align-items-center" href="'.htmlspecialchars($url).'">'.$iconHtml.htmlspecialchars($label).'</a></li>';
-                    }
-                }
-            } else {
-                if (empty($isAdmin)) {
-                    echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
+                   echo '<li class="nav-item"><a class="nav-link nav-user-icon" href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" aria-label="Iniciar sesión">'
                         . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconLogin.png" alt="Usuario" style="width: 24px; height: 24px;">'
-                        . '</a></li>';
-                }
-            }
+						. '';
+						echo '</a></li>';
+                echo '</ul>';
 
-            echo '</ul>';
+            }
 
             ?>
-          
         </div>
     </div>
 </nav>

@@ -34,17 +34,18 @@ class ProductoControl
     private function cargarObjeto($param)
     {
         $obj = null;
+        // Requerimos los campos mínimos; imagen y prodeshabilitado son opcionales
         if (
             array_key_exists('idproducto', $param) &&
             array_key_exists('pronombre', $param) &&
             array_key_exists('prodetalle', $param) &&
             array_key_exists('procantstock', $param) &&
-            array_key_exists('precio', $param) &&
-            array_key_exists('prodeshabilitado', $param) &&
-            array_key_exists('proimagen', $param)
+            array_key_exists('precio', $param)
         ) {
+            $imagen = array_key_exists('proimagen', $param) ? $param['proimagen'] : null;
+            $deshabilitado = array_key_exists('prodeshabilitado', $param) ? $param['prodeshabilitado'] : null;
             $obj = new producto();
-            $obj->setear($param['idproducto'], $param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['proimagen']);
+            $obj->setear($param['idproducto'], $param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $deshabilitado, $imagen);
         }
         return $obj;
     }
@@ -58,16 +59,17 @@ class ProductoControl
     private function cargarObjetoSinID($param)
     {
         $obj = null;
+        // Requerimos los campos mínimos; imagen y prodeshabilitado son opcionales
         if (
             array_key_exists('pronombre', $param) &&
             array_key_exists('prodetalle', $param) &&
             array_key_exists('procantstock', $param) &&
-            array_key_exists('precio', $param) &&
-            array_key_exists('prodeshabilitado', $param) &&
-            array_key_exists('proimagen', $param)
+            array_key_exists('precio', $param)
         ) {
+            $imagen = array_key_exists('proimagen', $param) ? $param['proimagen'] : null;
+            $deshabilitado = array_key_exists('prodeshabilitado', $param) ? $param['prodeshabilitado'] : null;
             $obj = new Producto();
-            $obj->setearSinID($param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $param['prodeshabilitado'], $param['proimagen']);
+            $obj->setearSinID($param['pronombre'], $param['prodetalle'], $param['procantstock'], $param['precio'], $deshabilitado, $imagen);
         }
         return $obj;
     }

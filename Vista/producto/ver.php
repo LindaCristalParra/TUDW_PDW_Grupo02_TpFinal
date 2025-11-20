@@ -28,6 +28,9 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
 require_once __DIR__ . '/../Estructura/header.php';
 require_once __DIR__ . '/../Util/funciones.php';
+// Determinar si el usuario es administrador
+$rolActivo = $session->getRolActivo();
+$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
 ?>
 <div class="container mt-4">
     <?php if ($product): ?>
@@ -43,10 +46,12 @@ require_once __DIR__ . '/../Util/funciones.php';
                 <p><?= nl2br(htmlspecialchars($product['prodetalle'])) ?></p>
                 <p class="fw-bold">Precio: $<?= number_format($product['precio'],2) ?></p>
                 <p>Stock: <?= intval($product['procantstock']) ?></p>
-                <?php if ($session->sesionActiva()): ?>
+                <?php if ($session->sesionActiva() && !$isAdmin): ?>
                     <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/agregarProdCarrito.php?idproducto=<?= $product['idproducto'] ?>" class="btn btn-primary">Agregar al carrito</a>
-                <?php else: ?>
+                <?php elseif (!$session->sesionActiva()): ?>
                     <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/login.php" class="btn btn-outline-primary">Iniciar sesión para comprar</a>
+                <?php else: ?>
+                    <!-- Administrador: sin acciones de carrito -->
                 <?php endif; ?>
             </div>
         </div>

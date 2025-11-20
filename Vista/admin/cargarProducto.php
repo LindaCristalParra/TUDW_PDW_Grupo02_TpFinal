@@ -20,7 +20,8 @@ if (!$isAdmin) {
 ?>
 <div class="container mt-4">
     <h2>Cargar nuevo producto</h2>
-    <form action="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/cargarNuevoProducto.php" method="post" enctype="multipart/form-data">
+    <form action="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/cargarNuevoProducto.php" method="post"
+        enctype="multipart/form-data">
         <div class="mb-3">
             <label class="form-label">Nombre</label>
             <input type="text" name="pronombre" class="form-control" required>
@@ -37,14 +38,15 @@ if (!$isAdmin) {
             <label class="form-label">Precio</label>
             <input type="number" step="0.01" name="precio" class="form-control" required>
         </div>
+        <div class="mb-3">
+            <label class="form-label">Imagen</label>
+            <input type="file" name="proimagen" class="form-control" accept="image/*">
+        </div>
         <div class="mb-3 form-check">
             <input type="checkbox" name="prodeshabilitado" value="1" class="form-check-input" id="deshabilitado">
             <label class="form-check-label" for="deshabilitado">Deshabilitado</label>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Imagen</label>
-            <input type="file" name="imagen" class="form-control" accept="image/*">
-        </div>
+
         <button class="btn btn-success" type="submit">Cargar producto</button>
         <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php" class="btn btn-secondary">Volver</a>
     </form>

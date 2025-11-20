@@ -13,8 +13,8 @@ $datos = carga_datos();
 
 
 // Asegurar que existe archivo en datos
-if (!empty($datos['imagen']) && is_array($datos['imagen']) && !empty($datos['imagen']['tmp_name'])) {
-    $archivo = $datos['imagen'];
+if (!empty($datos['proimagen']) && is_array($datos['proimagen']) && !empty($datos['proimagen']['tmp_name'])) {
+    $archivo = $datos['proimagen'];
 
     // Generar nombre único y mover al filesystem configurado
     $nombreArchivo = imagen_generar_nombre_unico($archivo['name'], 'prod');
