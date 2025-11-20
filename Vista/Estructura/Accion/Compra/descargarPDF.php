@@ -32,8 +32,11 @@ if (empty($listaCompras)) {
 
 $objCompra = $listaCompras[0];
 
-// Verificar que la compra pertenezca al usuario logueado
-if ($objCompra->getObjUsuario()->getID() != $idUsuarioLogueado) {
+// Verificar que la compra pertenezca al usuario logueado O que sea administrador
+$rolActivo = $session->getRolActivo();
+$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
+
+if (!$isAdmin && $objCompra->getObjUsuario()->getID() != $idUsuarioLogueado) {
     die("Acceso Denegado: Esta compra no te pertenece.");
 }
 
