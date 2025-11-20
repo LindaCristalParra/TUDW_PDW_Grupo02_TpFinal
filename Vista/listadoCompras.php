@@ -7,7 +7,7 @@ require_once __DIR__ . '/Estructura/header.php';
 ?>
 
 <style>
-/* Forzar hover con !important para sobreescribir Bootstrap si hace falta */
+
 .btn-cancel{ background:#ffffff; color:var(--header-red); border:1px solid var(--header-red); }
 .btn-cancel:hover, .btn-cancel:focus{ background:var(--header-red) !important; color:#ffffff !important; border-color:var(--header-red) !important; }
 .btn-view{ background:#ffffff; color:var(--pine-green); border:1px solid var(--pine-green); }
