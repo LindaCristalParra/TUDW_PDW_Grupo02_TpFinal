@@ -76,14 +76,14 @@ class Producto extends BaseDatos
         $resp = false;
         
         // Si lleva ID Autoincrement, la consulta SQL no lleva dicho ID
-        $sql="INSERT INTO producto(pronombre, prodetalle, procantstock, precio, prodeshabilitado, imagen) 
+        $sql="INSERT INTO producto(pronombre, prodetalle, procantstock, precio, proimagen,prodeshabilitado) 
             VALUES('"
             .$this->getPronombre()."', '"
             .$this->getProdetalle()."', '"
             .$this->getProCantStock()."', '"
             .$this->getPrecio()."', '"
-            .$this->getProDeshabilitado()."', '"
-            .$this->getImagen()."'
+            .$this->getImagen()."', '"
+            .$this->getProDeshabilitado()."'
         );";
         if ($this->Iniciar()) {
             if ($esteid = $this->Ejecutar($sql)) {
@@ -108,8 +108,8 @@ class Producto extends BaseDatos
         ."', prodetalle='".$this->getProDetalle()
         ."', procantstock='". $this->getProCantStock()
         ."', precio='". $this->getPrecio()
+        ."', proimagen='". $this->getImagen()
         ."', prodeshabilitado='". $this->getProDeshabilitado()
-        ."', imagen='". $this->getImagen()
         ."' WHERE idproducto='".$this->getID()."'";
         if ($this->Iniciar()) {
             if ($this->Ejecutar($sql)) {

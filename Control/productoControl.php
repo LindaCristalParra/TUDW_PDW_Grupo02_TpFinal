@@ -110,7 +110,13 @@ class ProductoControl
     {
         $resp = false;
 
-        $objProducto = $this->cargarObjeto($param);
+        // si viene idproducto, usamos cargarObjeto, sino cargamos sin ID
+        if (isset($param['idproducto'])) {
+            $objProducto = $this->cargarObjeto($param);
+        } else {
+            $objProducto = $this->cargarObjetoSinID($param);
+        }
+
         if ($objProducto != null and $objProducto->insertar()) {
             $resp = true;
         }
