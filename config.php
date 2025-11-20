@@ -1,4 +1,5 @@
 <?php
+include_once __DIR__ . '/confidencial.php';
 // Config global del proyecto
 // Rutas para imágenes: ruta en filesystem y prefijo web público
 
@@ -19,9 +20,9 @@ $GLOBALS['EMAIL_CONFIG'] = [
 	'smtp_host' => getenv('MAIL_HOST') !== false ? getenv('MAIL_HOST') : 'smtp.gmail.com',
 	'smtp_port' => getenv('MAIL_PORT') !== false ? intval(getenv('MAIL_PORT')) : 587,
 	'smtp_encryption' => getenv('MAIL_ENCRYPTION') !== false ? getenv('MAIL_ENCRYPTION') : 'tls',
-	'smtp_username' => getenv('MAIL_USERNAME') !== false ? getenv('MAIL_USERNAME') : 'tu-email@gmail.com',
-	'smtp_password' => getenv('MAIL_PASSWORD') !== false ? getenv('MAIL_PASSWORD') : 'tu-contraseña-de-aplicacion',
-	'from_email' => getenv('MAIL_FROM_ADDRESS') !== false ? getenv('MAIL_FROM_ADDRESS') : 'tu-email@gmail.com',
+	'smtp_username' => getenv('MAIL_USERNAME') !== false ? getenv('MAIL_USERNAME') : $email,
+	'smtp_password' => getenv('MAIL_PASSWORD') !== false ? getenv('MAIL_PASSWORD') : $password,
+	'from_email' => getenv('MAIL_FROM_ADDRESS') !== false ? getenv('MAIL_FROM_ADDRESS') : $email,
 	'from_name' => getenv('MAIL_FROM_NAME') !== false ? getenv('MAIL_FROM_NAME') : 'ChristmasMarket'
 ];
 

@@ -21,4 +21,6 @@ config/email.php
 # Logs
 *.log
 
+# Private files
+confidencial.php
 
