@@ -21,33 +21,70 @@ $badgeColor = $coloresEstado[$idEstadoTipo] ?? 'bg-info';
         <h2 style="color:var(--pine-green);">
             <i class="bi bi-receipt"></i> Detalle de Compra #<?php echo $objCompra->getID(); ?>
         </h2>
-        <div>
-            <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/descargarPDF.php?id=<?php echo $objCompra->getID(); ?>" class="btn btn-danger me-2">
-                <i class="bi bi-file-pdf"></i> Descargar PDF
-            </a>
-            <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/listado.php" class="btn btn-outline-secondary">
-                &larr; Volver a Mis Compras
-            </a>
-        </div>
+        
+        <?php 
+        // Lógica dinámica para el botón "Volver"
+        if ($esAdmin) {
+            $textoVolver = "Volver a Ventas";
+            $rutaVolver = "/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Venta/listado.php"; 
+        } else {
+            $textoVolver = "Volver a Mis Compras";
+            $rutaVolver = "/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/misCompras.php";
+        }
+        ?>
+
+        <a href="<?php echo $rutaVolver; ?>" class="btn btn-outline-secondary">
+            &larr; <?php echo $textoVolver; ?>
+        </a>
     </div>
 
-    <div class="card shadow-sm mb-4 border-top-0 border-start-0 border-end-0 border-bottom-0" style="border-left: 5px solid var(--pine-green) !important;">
+   <div class="card shadow-sm mb-4 border-top-0 border-start-0 border-end-0 border-bottom-0" style="border-left: 5px solid var(--pine-green) !important;">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
+            <div class="row align-items-center">
+                
+                <div class="col-md-3">
                     <small class="text-muted text-uppercase">Fecha de Compra</small><br>
                     <strong><?php echo $objCompra->getCoFecha(); ?></strong>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-6">
                     <small class="text-muted text-uppercase">Estado Actual</small><br>
-                    <span class="badge <?php echo $badgeColor; ?> fs-6 rounded-pill px-3">
-                        <?php echo ucfirst($descEstado); ?>
-                    </span>
+                    
+                    <?php if ($esAdmin): ?>
+                        <form action="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Venta/listado.php" method="post" class="d-flex align-items-center mt-1">
+                            <input type="hidden" name="idcompra" value="<?php echo $objCompra->getID(); ?>">
+                            
+                            <select name="nuevoEstado" class="form-select form-select-sm border-danger me-2" style="max-width: 200px;">
+                                <option value="1" <?php echo ($idEstadoTipo == 1)?'selected':''; ?>>Iniciada</option>
+                                <option value="2" <?php echo ($idEstadoTipo == 2)?'selected':''; ?>>Aceptada</option>
+                                <option value="3" <?php echo ($idEstadoTipo == 3)?'selected':''; ?>>Enviada</option>
+                                <option value="4" <?php echo ($idEstadoTipo == 4)?'selected':''; ?>>Cancelada</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-sm btn-danger text-nowrap" onclick="return confirm('¿Cambiar estado? Se enviará notificación.');">
+                                <i class="bi bi-check-lg"></i> Guardar
+                            </button>
+                        </form>
+                    
+                    <?php else: ?>
+                        <span class="badge <?php echo $badgeColor; ?> fs-6 rounded-pill px-3 mt-1">
+                            <?php echo ucfirst($descEstado); ?>
+                        </span>
+                    <?php endif; ?>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-3 text-end">
                     <small class="text-muted text-uppercase">Cliente</small><br>
-                    <strong><?php echo $objCompra->getObjUsuario()->getUsNombre(); ?></strong>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="bg-light rounded-circle p-2 me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                            </svg>
+                        </div>
+                        <strong><?php echo $objCompra->getObjUsuario()->getUsNombre(); ?></strong>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

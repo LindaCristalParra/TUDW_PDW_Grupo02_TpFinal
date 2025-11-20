@@ -655,4 +655,61 @@ class CompraControl
         $unMesAtras = Carbon::now()->subMonth();
         return $fecha->isAfter($unMesAtras);
     }
+
+     /**
+     * Busca los datos necesarios y llama a cambiarEstado.
+     * @param int $idCompra El ID de la compra a modificar
+     * @param int $nuevoEstadoTipo El ID del nuevo estado
+     * @return boolean
+     */
+    public function actualizarEstadoCompra($idCompra, $nuevoEstadoTipo)
+    {
+        // Configuración básica
+        date_default_timezone_set('America/Argentina/Buenos_Aires');
+        $fechaHoraActual = date('Y-m-d H:i:s');
+        $fechaCeros = '0000-00-00 00:00:00';
+        
+        $objCompraEstadoControl = new CompraEstadoControl();
+        $exito = false;
+
+        // BUSCAR EL ESTADO ACTUAL ACTIVO
+        // Buscamos estados con fecha fin nula o ceros
+        $estadosActivos = $objCompraEstadoControl->buscar([
+            'idcompra' => $idCompra,
+            'cefechafin' => $fechaCeros 
+        ]);
+
+        // Si no encuentra por ceros, busca por null
+        if (empty($estadosActivos)) {
+             $todos = $objCompraEstadoControl->buscar(['idcompra' => $idCompra]);
+             foreach ($todos as $e) {
+                 if ($e->getCeFechaFin() == null) {
+                     $estadosActivos[] = $e;
+                 }
+             }
+        }
+
+        // LLAMAR A FUNCIÓN CAMBIARESTADO 
+        foreach ($estadosActivos as $estadoViejo) {
+            
+            // Preparamos los datos que 'cambiarEstado' necesita en su primer parámetro $data
+            $dataParaFuncion = [
+                'idcompraestado' => $estadoViejo->getID(),      
+                'idcompra' => $idCompra,                        
+                'idcompraestadotipo' => $nuevoEstadoTipo        
+            ];
+
+            // Datos del estado viejo para pasar como argumentos sueltos
+            $idTipoViejo = $estadoViejo->getObjCompraEstadoTipo()->getID();
+            $fechaInicioVieja = $estadoViejo->getCeFechaIni();
+
+            // Llamada a la función
+            
+            if ($this->cambiarEstado($dataParaFuncion, $idTipoViejo, $fechaInicioVieja, $fechaHoraActual, $objCompraEstadoControl)) {
+                $exito = true;
+            }
+        }
+
+        return $exito;
+    }
 }
