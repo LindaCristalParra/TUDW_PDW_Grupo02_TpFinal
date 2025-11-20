@@ -19,21 +19,43 @@ class EmailService
     private static function cargarConfig(): array
     {
         if (self::$config === null) {
-            $configFile = __DIR__ . '/../../config/email.php';
-            if (file_exists($configFile)) {
-                self::$config = require $configFile;
-            } else {
-                // Configuración por defecto
-                self::$config = [
-                    'smtp_host' => 'smtp.gmail.com',
-                    'smtp_port' => 587,
-                    'smtp_encryption' => 'tls',
-                    'smtp_username' => 'tu-email@gmail.com',
-                    'smtp_password' => 'tu-contraseña-de-aplicacion',
-                    'from_email' => 'tu-email@gmail.com',
-                    'from_name' => 'ChrismasMarket'
-                ];
+            // Preferir configuración central en config.php (proyecto)
+            $projectConfig = __DIR__ . '/../../config.php';
+            if (file_exists($projectConfig)) {
+                // cargar archivo (define $GLOBALS['EMAIL_CONFIG'])
+                require_once $projectConfig;
+                if (isset($GLOBALS['EMAIL_CONFIG']) && is_array($GLOBALS['EMAIL_CONFIG'])) {
+                    self::$config = $GLOBALS['EMAIL_CONFIG'];
+                } else {
+                    // También aceptar variables sueltas en $GLOBALS (compatibilidad)
+                    $cfg = [];
+                    $cfg['smtp_host'] = $GLOBALS['MAIL_HOST'] ?? ($GLOBALS['SMTP_HOST'] ?? null);
+                    $cfg['smtp_port'] = isset($GLOBALS['MAIL_PORT']) ? intval($GLOBALS['MAIL_PORT']) : (isset($GLOBALS['SMTP_PORT']) ? intval($GLOBALS['SMTP_PORT']) : null);
+                    $cfg['smtp_encryption'] = $GLOBALS['MAIL_ENCRYPTION'] ?? ($GLOBALS['SMTP_ENCRYPTION'] ?? null);
+                    $cfg['smtp_username'] = $GLOBALS['MAIL_USERNAME'] ?? ($GLOBALS['SMTP_USERNAME'] ?? null);
+                    $cfg['smtp_password'] = $GLOBALS['MAIL_PASSWORD'] ?? ($GLOBALS['SMTP_PASSWORD'] ?? null);
+                    $cfg['from_email'] = $GLOBALS['MAIL_FROM_ADDRESS'] ?? ($GLOBALS['FROM_EMAIL'] ?? null);
+                    $cfg['from_name'] = $GLOBALS['MAIL_FROM_NAME'] ?? ($GLOBALS['FROM_NAME'] ?? null);
+
+                    // If at least one key is present, use this partial config merged with defaults
+                    $hasAny = false;
+                    foreach ($cfg as $v) { if ($v !== null) { $hasAny = true; break; } }
+                    if ($hasAny) {
+                        // Fill missing with defaults below
+                        self::$config = array_merge([
+                            'smtp_host' => 'smtp.gmail.com',
+                            'smtp_port' => 587,
+                            'smtp_encryption' => 'tls',
+                            'smtp_username' => 'tu-email@gmail.com',
+                            'smtp_password' => 'tu-contraseña-de-aplicacion',
+                            'from_email' => 'tu-email@gmail.com',
+                            'from_name' => 'ChrismasMarket'
+                        ], array_filter($cfg, function($v){ return $v !== null; }));
+                    }
+                }
             }
+
+          
         }
         return self::$config;
     }
