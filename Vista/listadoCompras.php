@@ -4,6 +4,17 @@
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 require_once __DIR__ . '/Estructura/header.php';
+?>
+
+<style>
+/* Forzar hover con !important para sobreescribir Bootstrap si hace falta */
+.btn-cancel{ background:#ffffff; color:var(--header-red); border:1px solid var(--header-red); }
+.btn-cancel:hover, .btn-cancel:focus{ background:var(--header-red) !important; color:#ffffff !important; border-color:var(--header-red) !important; }
+.btn-view{ background:#ffffff; color:var(--pine-green); border:1px solid var(--pine-green); }
+.btn-view:hover, .btn-view:focus{ background:var(--pine-green) !important; color:#ffffff !important; border-color:var(--pine-green) !important; }
+</style>
+
+<?php
 require_once __DIR__ . '/../Control/Session.php';
 require_once __DIR__ . '/../Control/compraControl.php';
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -123,13 +134,13 @@ $compras = $compraCtrl->listarCompras($idUsuario);
                             <span class="badge bg-<?php echo $estadoBadge; ?>"><?php echo htmlspecialchars($c['estado'] ?? ''); ?></span>
                         </td>
                         <td>
-                             <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/verCompra.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-outline-primary">Ver</a>
+                             <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/verCompra.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-view" style="background:#ffffff;color:var(--pine-green);border:1px solid var(--pine-green);">Ver</a>
                             <?php if (strtolower($c['estado']) !== 'enviado' && strtolower($c['estado']) !== 'cancelada') : ?>
                                 <?php if ($puedeCancelar) : ?>
                                     <form method="post" style="display:inline;">
                                         <input type="hidden" name="cancelar_id" value="<?php echo htmlspecialchars($c['idcompra']); ?>">
                                         <input type="hidden" name="cancelar_estado" value="<?php echo htmlspecialchars($c['idcompraestado']); ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas cancelar esta compra?');">Cancelar</button>
+                                        <button type="submit" class="btn btn-sm btn-cancel" style="background:#ffffff;color:var(--header-red);border:1px solid var(--header-red);" onclick="return confirm('¿Seguro que deseas cancelar esta compra?');">Cancelar</button>
                                     </form>
                                 <?php else : ?>
                                     <button class="btn btn-sm btn-secondary" disabled title="Solo se pueden cancelar compras con menos de 24 horas">Cancelar</button>
