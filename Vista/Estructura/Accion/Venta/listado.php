@@ -18,12 +18,54 @@ if (empty($rolActivo) || !isset($rolActivo['rol']) || strtolower($rolActivo['rol
 }
 
 $compraCtrl = new CompraControl();
-$menuCtrl = new MenuControl();
-$menuData = $menuCtrl->armarMenu();
 
-// Obtener todas las compras con su último estado
-$compras = $compraCtrl->listarComprasUsuarios();
 
-// Reusar la vista existente de listado de compras
-require_once __DIR__ . '/../../../../Vista/listadoCompras.php';
+// Obtener todas las ventas
+// listarVentas devuelve objetos Compra; convertimos a arrays que la vista espera
+$comprasObj = $compraCtrl->listarVentas();
+$compras = [];
+require_once __DIR__ . '/../../../../Control/compraEstadoControl.php';
+$compraEstadoCtrl = new CompraEstadoControl();
+
+if (is_array($comprasObj)) {
+	foreach ($comprasObj as $elem) {
+		if (is_object($elem) && method_exists($elem, 'getID')) {
+			$id = $elem->getID();
+			// obtener estados de la compra
+			$listaCE = $compraEstadoCtrl->buscar(['idcompra' => $id]);
+			$estado = '';
+			$idcompraestado = null;
+			$usnombre = '';
+			$cofecha = $elem->getCofecha();
+
+			if (count($listaCE) > 0) {
+				$lastPos = count($listaCE) - 1;
+				$estado = $listaCE[$lastPos]->getObjCompraEstadoTipo()->getCetDescripcion();
+				$idcompraestado = $listaCE[$lastPos]->getID();
+				$usnombre = $listaCE[$lastPos]->getObjCompra()->getObjUsuario()->getUsNombre();
+				$cofecha = $listaCE[$lastPos]->getCeFechaIni();
+			}
+
+			$compras[] = [
+				'idcompra' => $id,
+				'cofecha' => $cofecha,
+				'finfecha' => null,
+				'usnombre' => $usnombre,
+				'estado' => $estado,
+				'idcompraestado' => $idcompraestado
+			];
+		} elseif (is_array($elem)) {
+			// Si ya viene como array asociativo, lo agregamos tal cual
+			$compras[] = $elem;
+		}
+	}
+}
+
+// Preferir una vista dedicada para ventas de administrador; si no existe, reutilizar la vista genérica
+$vistaDedicada = __DIR__ . '/../../../../Vista/venta/listado.php';
+if (file_exists($vistaDedicada)) {
+	require_once $vistaDedicada;
+} else {
+	require_once __DIR__ . '/../../../../Vista/listadoCompras.php';
+}
 
