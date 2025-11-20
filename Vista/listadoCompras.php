@@ -135,7 +135,7 @@ $compras = $compraCtrl->listarCompras($idUsuario);
                         </td>
                         <td>
                              <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/verCompra.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-view" style="background:#ffffff;color:var(--pine-green);border:1px solid var(--pine-green);">Ver</a>
-                            <?php if (strtolower($c['estado']) !== 'enviado' && strtolower($c['estado']) !== 'cancelada') : ?>
+                            <?php if (strtolower($c['estado']) !== 'enviada' && strtolower($c['estado']) !== 'cancelada') : ?>
                                 <?php if ($puedeCancelar) : ?>
                                     <form method="post" style="display:inline;">
                                         <input type="hidden" name="cancelar_id" value="<?php echo htmlspecialchars($c['idcompra']); ?>">
