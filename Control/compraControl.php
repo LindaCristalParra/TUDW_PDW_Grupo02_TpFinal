@@ -784,4 +784,73 @@ class CompraControl
 
         return $exito;
     }
+
+    /**
+     * Encapsula toda la lógica para agregar o sumar un producto al carrito activo.
+     * @param int $idUsuario
+     * @param int $idProducto
+     * @param string $claseItemControl (Nombre de la clase CompraItemControl/CompraProductoControl)
+     * @return boolean Éxito o Fracaso de la transacción
+     */
+    public function agregarProductoAlCarrito($idUsuario, $idProducto, $claseItemControl)
+    {
+        // Nota: Asumimos que los requires de CompraEstadoControl, UsuarioControl, etc. están al inicio del archivo.
+        $abmItem = new $claseItemControl();
+        $abmCompraEstado = new CompraEstadoControl();
+        $abmCompra = new CompraControl(); // Usamos la misma clase
+        $uControl = new UsuarioControl(); // Usamos el mismo control
+
+        // 1. BUSCAR O CREAR CARRITO ACTIVO
+        $carritoObj = $uControl->obtenerCarrito($idUsuario);
+        $idCompraActiva = null;
+
+        if ($carritoObj != null) {
+            $idCompraActiva = $carritoObj->getID();
+        } else {
+            // Si no existe, creamos uno nuevo
+            if ($abmCompra->alta(['idusuario' => $idUsuario])) {
+                $compras = $abmCompra->buscar(['idusuario' => $idUsuario]);
+                $ultimaCompra = end($compras);
+                $idCompraActiva = $ultimaCompra->getId();
+                
+                // Asignar el estado inicial (1 = iniciada)
+                $abmCompraEstado->alta([
+                    'idcompra' => $idCompraActiva, 
+                    'idcompraestadotipo' => 1,
+                    'cefechafin' => '0000-00-00 00:00:00' 
+                ]);
+            } else {
+                return false; // Falló la creación de la compra
+            }
+        }
+
+        // 2. GESTIONAR EL ITEM (Insertar o Sumar)
+        $itemsEnCarrito = $abmItem->buscar([
+            'idcompra' => $idCompraActiva,
+            'idproducto' => $idProducto
+        ]);
+
+        if (!empty($itemsEnCarrito)) {
+            // UPDATE: Sumar cantidad
+            $itemExistente = $itemsEnCarrito[0];
+            $nuevaCantidad = $itemExistente->getCiCantidad() + 1;
+            
+            $param = [
+                'idcompraitem' => $itemExistente->getId(),
+                'idcompra'     => $idCompraActiva,
+                'idproducto'   => $idProducto,
+                'cicantidad'   => $nuevaCantidad
+            ];
+            return $abmItem->modificacion($param);
+
+        } else {
+            // INSERT: Nuevo item
+            $param = [
+                'idcompra'   => $idCompraActiva,
+                'idproducto' => $idProducto,
+                'cicantidad' => 1
+            ];
+            return $abmItem->alta($param);
+        }
+    }
 }
