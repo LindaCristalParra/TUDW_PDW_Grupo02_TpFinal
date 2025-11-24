@@ -30,6 +30,17 @@ if (!isset($compras)) {
 }
 
 $compraCtrl = new CompraControl();
+// Detectar rol activo para ocultar acciones administrativas en ciertos roles
+require_once __DIR__ . '/../../Control/Session.php';
+$session = new Session();
+$rolActivo = $session->getRolActivo();
+$esAdmin = false;
+if (!empty($rolActivo) && isset($rolActivo['rol'])) {
+    $rolDesc = strtolower($rolActivo['rol']);
+    if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador') {
+        $esAdmin = true;
+    }
+}
 ?>
 
 <div class="container mt-4">
@@ -69,7 +80,7 @@ $compraCtrl = new CompraControl();
                         </td>
                         <td>
                             <a href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/verCompra.php?id=<?php echo urlencode($c['idcompra']); ?>" class="btn btn-sm btn-view" style="background:#ffffff;color:var(--pine-green);border:1px solid var(--pine-green);">Ver</a>
-                            <?php if (strtolower($c['estado']) !== 'enviado' && strtolower($c['estado']) !== 'cancelada') : ?>
+                            <?php if (strtolower($c['estado']) !== 'enviado' && strtolower($c['estado']) !== 'cancelada' && !$esAdmin) : ?>
                                 <?php if ($puedeCancelar) : ?>
                                     <form method="post" action="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/modificarEstado.php" style="display:inline;">
                                         <input type="hidden" name="idcompra" value="<?= htmlspecialchars($c['idcompra']) ?>">
