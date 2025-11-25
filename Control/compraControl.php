@@ -6,6 +6,7 @@ require_once __DIR__ . '/../Modelo/compraItem.php';
 require_once __DIR__ . '/compraItemControl.php';
 require_once __DIR__ . '/Session.php';
 require_once __DIR__ . '/usuarioControl.php';
+require_once __DIR__ . '/productoControl.php';
 // Asegúrate de tener acceso a BaseDatos para el listado SQL
 require_once __DIR__ . '/../Modelo/Conector/BaseDatos.php';
 // Cargar Carbon para manejo de fechas
@@ -868,4 +869,75 @@ class CompraControl
             return $abmItem->alta($param);
         }
     }
+
+/**
+     * Realiza todo el proceso de finalizar la compra: validación de stock, descuento y cambio de estado.
+     * @param int $idUsuario
+     * @return array ['exito' => bool, 'mensaje' => string, 'idcompra' => int, 'detalle' => string]
+     */
+    public function finalizarCompraCompleta($idUsuario)
+    {
+        $uControl = new UsuarioControl();
+        $carrito = $uControl->obtenerCarrito($idUsuario);
+
+        if ($carrito == null) {
+            return ['exito' => false, 'mensaje' => 'carrito_vacio_error'];
+        }
+
+        // 1. Obtener productos
+        $productos = $this->listadoProdCarrito($carrito);
+        if (empty($productos)) {
+            return ['exito' => false, 'mensaje' => 'carrito_vacio'];
+        }
+
+        // 2. Validar Stock
+        $prodCtrl = new ProductoControl();
+        foreach ($productos as $item) {
+            // Nos aseguramos de traer el objeto producto fresco
+            $listaP = $prodCtrl->buscar(['idproducto' => $item['idproducto']]);
+            if (count($listaP) > 0) {
+                $objProd = $listaP[0];
+                $stockActual = $objProd->getProCantStock();
+                $cantidadSolicitada = $item['cicantidad'];
+
+                if ($stockActual < $cantidadSolicitada) {
+                    return [
+                        'exito' => false, 
+                        'mensaje' => 'sin_stock', 
+                        'detalle' => "No hay suficiente stock de " . $item['pronombre']
+                    ];
+                }
+            }
+        }
+
+        // 3. Descontar Stock (Si llegamos aquí, hay stock de todo)
+        foreach ($productos as $item) {
+            $listaP = $prodCtrl->buscar(['idproducto' => $item['idproducto']]);
+            if (count($listaP) > 0) {
+                $objProd = $listaP[0];
+                $nuevoStock = $objProd->getProCantStock() - $item['cicantidad'];
+                
+                $datosProd = [
+                    'idproducto' => $objProd->getID(),
+                    'pronombre' => $objProd->getProNombre(),
+                    'prodetalle' => $objProd->getProDetalle(),
+                    'procantstock' => $nuevoStock,
+                    'precio' => $objProd->getPrecio(),
+                    'proimagen' => $objProd->getImagen()
+                ];
+                $prodCtrl->modificacion($datosProd);
+            }
+        }
+
+        // 4. Cambiar Estado y Enviar Mail
+        // Llamamos a la función interna que ya tenías programada
+        $resultado = $this->iniciarCompra($carrito);
+
+        if ($resultado) {
+            return ['exito' => true, 'idcompra' => $carrito->getID()];
+        } else {
+            return ['exito' => false, 'mensaje' => 'error_procesando'];
+        }
+    }
+
 }
