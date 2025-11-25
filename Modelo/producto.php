@@ -328,4 +328,28 @@ class Producto extends BaseDatos
         return $this;
     }
 
+    /**
+     * Método específico para actualizar SOLO el stock.
+     * Esto evita sobrescribir imágenes u otros datos accidentalmente.
+     * @param int $nuevoStock
+     * @return boolean
+     */
+    public function actualizarStockBD($nuevoStock)
+    {
+        $resp = false;
+        $base = new BaseDatos();
+        
+        $sql = "UPDATE producto SET procantstock = " . intval($nuevoStock) . " WHERE idproducto = " . $this->getID();
+        
+        if ($base->Iniciar()) {
+            if ($base->Ejecutar($sql)) {
+                $resp = true;
+            } else {
+                $this->setMensajeOperacion("Producto->actualizarStockBD: ".$base->getError());
+            }
+        } else {
+            $this->setMensajeOperacion("Producto->actualizarStockBD: ".$base->getError());
+        }
+        return $resp;
+    }
 }

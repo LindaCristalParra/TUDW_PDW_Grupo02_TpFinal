@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Modelo/producto.php';
+require_once __DIR__ . '/../Modelo/Conector/BaseDatos.php';
 
 class ProductoControl
 {
@@ -334,24 +335,18 @@ class ProductoControl
     }
 
     /**
-     * Modifica únicamente el stock de un producto (usado por rol deposito)
-     * @param array $param ['idproducto'=>int, 'procantstock'=>int]
+     * Busca un producto por ID y actualiza solamente su stock.
+     * Respeta MVC delegando el SQL al Modelo.
+     * @param int $idProducto
+     * @param int $nuevoStock
      * @return boolean
      */
-    public function modificarStock($param)
+    public function actualizarStock($idProducto, $nuevoStock)
     {
-        $resp = false;
-        if (!empty($param) && isset($param['idproducto']) && isset($param['procantstock'])) {
-            $objProducto = $this->cargarObjetoConClave($param);
-            if ($objProducto != null) {
-                $objProducto->cargar();
-                $objProducto->setProCantStock(intval($param['procantstock']));
-                if ($objProducto->modificar()) {
-                    $resp = true;
-                }
-            }
-        }
-        return $resp;
+        $producto = new Producto();
+        $producto->setID($idProducto);
+        
+        return $producto->actualizarStockBD($nuevoStock);
     }
 
 }

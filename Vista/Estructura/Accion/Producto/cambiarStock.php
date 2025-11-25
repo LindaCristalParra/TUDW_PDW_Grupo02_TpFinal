@@ -1,39 +1,45 @@
 <?php
 // Vista/Estructura/Accion/Producto/cambiarStock.php
-require_once __DIR__ . '/../../../../Control/Session.php';
-require_once __DIR__ . '/../../../../Control/productoControl.php';
+
+// RUTAS
+$root = __DIR__ . '/../../../../';
+require_once $root . 'Control/Session.php';
+require_once $root . 'Control/productoControl.php';
 
 $session = new Session();
-if (!$session->sesionActiva()) {
-    header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/login.php');
-    exit;
-}
 
+// SEGURIDAD (Login + Rol Admin)
 $rol = $session->getRolActivo();
-$isAdmin = (!empty($rol) && isset($rol['rol']) && strtolower($rol['rol']) === 'administrador');
-if (!$isAdmin) {
-    echo '<div class="container mt-4"><div class="alert alert-danger">Acceso denegado. Debés ser administrador.</div></div>';
-    require_once __DIR__ . '/../../../../Vista/Estructura/footer.php';
+// Validación
+$esAdmin = (!empty($rol) && ($rol['id'] == 1 || strtolower($rol['rol']) === 'administrador'));
+
+if (!$session->activa() || !$esAdmin) {
+    header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/login.php?msg=acceso_denegado');
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/listadoProductos.php');
-    exit;
+// RECOLECCIÓN DE DATOS
+$idProducto = $_POST['idproducto'] ?? null;
+$cantStock = $_POST['procantstock'] ?? null;
+
+// INVOCAR CONTROLADOR
+$resultado = false;
+
+// Validamos que el stock sea numérico
+if ($idProducto !== null && $cantStock !== null && is_numeric($cantStock)) {
+    $prodCtrl = new ProductoControl();
+    
+    $resultado = $prodCtrl->actualizarStock($idProducto, $cantStock);
 }
 
-$idproducto = isset($_POST['idproducto']) ? intval($_POST['idproducto']) : null;
-$procantstock = isset($_POST['procantstock']) ? intval($_POST['procantstock']) : null;
+// REDIRECCIÓN
+// Redirigimos al ACTION de listado para que recargue los datos
+$rutaListado = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php';
 
-$productoCtrl = new ProductoControl();
-if ($idproducto === null || $procantstock === null) {
-    // Redirect back with error (simple)
-    header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/listadoProductos.php');
-    exit;
+if ($resultado) {
+    header("Location: $rutaListado?msg=stock_actualizado");
+} else {
+    header("Location: $rutaListado?msg=error_stock");
 }
-
-$result = $productoCtrl->modificarStock(['idproducto' => $idproducto, 'procantstock' => $procantstock]);
-
-// Redirect back to product list (could add flash messages later)
-header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php');
 exit;
+?>
