@@ -39,7 +39,13 @@ if ($session->sesionActiva()) {
 
 // Determinar si el usuario es administrador (para mostrar link en el nav)
 $rolActivo = $session->getRolActivo();
-$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
+$isAdmin = false;
+if (!empty($rolActivo) && isset($rolActivo['rol'])) {
+    $rolDesc = strtolower($rolActivo['rol']);
+    if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador') {
+        $isAdmin = true;
+    }
+}
 
 ?>
 
@@ -205,21 +211,19 @@ $isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolAct
                 }
                 echo '</ul>';
 
-                // carrito
+                // carrito (fallback) - ocultar si es admin
+                if (empty($isAdmin)) {
+                    $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
+                    echo '<ul class="navbar-nav">';
+                    echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
+                       . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">';
 
-                $cartUrl = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php';
-                echo '<ul class="navbar-nav">';
-                echo '<li class="nav-item"><a class="nav-link position-relative" href="'.htmlspecialchars($cartUrl).'" aria-label="Ver carrito">'
-               . '<img src="/TUDW_PDW_Grupo02_TpFinal/Util/Imagenes/IconShop.png" alt="Carrito" style="width: 24px; height: 24px;">'
-    			. '';
+                    if ($cartCount > 0) {
+                        echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
+                    }
 
-                if ($cartCount > 0) {
-
-                    echo '<span class="badge rounded-pill bg-danger position-absolute" style="top:4px;right:0;">'.intval($cartCount).'</span>';
-
+                    echo '</a></li>';
                 }
-
-                echo '</a></li>';
 
                 // login/logout icon - mostrar según estado de sesión
                 if ($session->sesionActiva()) {
