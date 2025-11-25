@@ -255,7 +255,54 @@ class CompraItem extends BaseDatos{
 
         return $this;
     }
-}
 
 
+    /**
+     * Retorna un array con los detalles de los productos de una compra específica.
+     * Realiza el JOIN con la tabla producto.
+     * @param int $idCompra
+     * @return array
+     */
+    public function listarDetallesCompra($idCompra)
+    {
+        $arreglo = [];
+        $base = new BaseDatos();
+        
+        $sql = "SELECT 
+                    ci.idcompraitem, 
+                    ci.cicantidad, 
+                    p.idproducto, 
+                    p.pronombre, 
+                    p.prodetalle, 
+                    p.precio,      
+                    p.proimagen    
+                FROM compraitem ci
+                INNER JOIN producto p ON ci.idproducto = p.idproducto
+                WHERE ci.idcompra = " . intval($idCompra);
+
+        if ($base->Iniciar()) {
+            if ($base->Ejecutar($sql) > -1) {
+                if ($base->Ejecutar($sql) > 0) { 
+                    while ($row = $base->Registro()) {
+                        $arreglo[] = [
+                            'idcompraitem' => $row['idcompraitem'],
+                            'cicantidad'   => $row['cicantidad'],
+                            'idproducto'   => $row['idproducto'],
+                            'pronombre'    => $row['pronombre'],
+                            'prodetalle'   => $row['prodetalle'],
+                            'precio'       => $row['precio'],      
+                            'proimagen'    => $row['proimagen']    
+                        ];
+                    }
+                }
+            } else {
+                $this->setMensajeOperacion("CompraItem->listarDetalles: ".$base->getError());
+            }
+        } else {
+            $this->setMensajeOperacion("CompraItem->listarDetalles: ".$base->getError());
+        }
+        
+        return $arreglo;
+    }
+}   
 ?>

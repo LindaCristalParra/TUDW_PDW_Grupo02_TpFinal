@@ -7,9 +7,7 @@ require_once __DIR__ . '/compraItemControl.php';
 require_once __DIR__ . '/Session.php';
 require_once __DIR__ . '/usuarioControl.php';
 require_once __DIR__ . '/productoControl.php';
-// Asegúrate de tener acceso a BaseDatos para el listado SQL
 require_once __DIR__ . '/../Modelo/Conector/BaseDatos.php';
-// Cargar Carbon para manejo de fechas
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Carbon\Carbon;
@@ -195,99 +193,14 @@ class CompraControl
         $arreglo = [];
 
         if ($carrito != null) {
-            $base = new BaseDatos();
-            $idCompra = $carrito->getID();
-
-            // JOIN entre compraitem y producto para traer todo junto
-            $sql = "SELECT 
-                        ci.idcompraitem, 
-                        ci.cicantidad, 
-                        p.idproducto, 
-                        p.pronombre, 
-                        p.prodetalle, 
-                        p.precio,      
-                        p.proimagen    
-                    FROM compraitem ci
-                    INNER JOIN producto p ON ci.idproducto = p.idproducto
-                    WHERE ci.idcompra = " . $idCompra;
-
-            if ($base->Iniciar()) {
-                $res = $base->Ejecutar($sql);
-                if ($res > -1) {
-                    if ($res > 0) {
-                        while ($row = $base->Registro()) {
-                            $arreglo[] = [
-                                'idcompraitem' => $row['idcompraitem'],
-                                'cicantidad' => $row['cicantidad'],
-                                'idproducto' => $row['idproducto'],
-                                'pronombre' => $row['pronombre'],
-                                'prodetalle' => $row['prodetalle'],
-                                'precio' => $row['precio'],
-                                'proimagen' => $row['proimagen']
-                            ];
-                        }
-                    }
-                }
-            }
+            $objCompraItem = new CompraItem();
+            // Delegamos la tarea sucia a quien corresponde: El Modelo
+            $arreglo = $objCompraItem->listarDetallesCompra($carrito->getID());
         }
+        
         return $arreglo;
     }
-    /* FIN LISTAR PRODUCTOS CARRITO */
-
-
-    /* AGREGAR PRODUCTO AL CARRITO */
-    public function agregarProdCarrito($data)
-    {
-        $respuesta = false;
-        $objSession = new Session();
-        $objUsuario = new UsuarioControl();
-        $idUserLogueado = $objSession->getIDUsuarioLogueado();
-        $carrito = $objUsuario->obtenerCarrito($idUserLogueado);
-        if ($carrito <> null) {
-            $respuesta = $this->verificarStockProd($carrito, $data);
-            if ($respuesta) {
-                $respuesta = $this->sumarProdCarrito($carrito, $data);
-            }
-        } else {
-            $carritoNuevo = $this->crearCarrito($idUserLogueado);
-            if ($carritoNuevo <> null) {
-                $respuesta = $this->sumarProdCarrito($carritoNuevo, $data);
-            }
-        }
-        return $respuesta;
-    }
-
-    public function sumarProdCarrito($objCompraCarrito, $data)
-    {
-        $respuesta = false;
-        $objCompraItemControl = new CompraItemControl();
-        $idCompra = $objCompraCarrito->getID();
-        $param = array(
-            'idproducto' => $data['idproducto'],
-            'idcompra' => $idCompra
-        );
-        $listaCompraItem = $objCompraItemControl->buscar($param);
-        if (count($listaCompraItem) > 0) {
-            $objCompraItemControl = $listaCompraItem[0];
-            $idCI = $objCompraItemControl->getID();
-            $cantidadCI = $objCompraItemControl->getCiCantidad();
-            $nuevaCantCI = $cantidadCI + 1;
-            $paramCI = array(
-                'idcompraitem' => $idCI,
-                'idproducto' => $data['idproducto'],
-                'idcompra' => $idCompra,
-                'cicantidad' => $nuevaCantCI
-            );
-            $respuesta = $objCompraItemControl->modificacion($paramCI);
-            if (!$respuesta) {
-                // echo "no se modifico";
-            }
-        } else {
-            $data['idcompra'] = $idCompra;
-            $respuesta = $objCompraItemControl->altaSinID($data);
-        }
-        return $respuesta;
-    }
+    
 
     /**
      * Elimina un item verificando que pertenezca al usuario logueado.
@@ -325,67 +238,6 @@ class CompraControl
         }
     }
 
-    public function crearCarrito($idUser)
-    {
-        date_default_timezone_set('America/Argentina/Buenos_Aires');
-        $carrito = null;
-        $objCompraControl = new CompraControl();
-        $param = array(
-            'cofecha' => date('Y-m-d H:i:s'),
-            'idusuario' => $idUser
-        );
-        $respuesta = $objCompraControl->altaSinID($param);
-        if (!$respuesta) {
-            // echo "no se creo el carrito";
-        }
-        if ($respuesta) {
-            $paramIDUsuario['idusuario'] = $idUser;
-            $objCompraEstadoControl = new CompraEstadoControl();
-            $listaCompras = $this->buscar($paramIDUsuario);
-            $posCompra = count($listaCompras) - 1;
-            $idCompra = $listaCompras[$posCompra]->getID();
-            $paramCompraEstado = array(
-                'idcompra' => $idCompra,
-                'idcompraestadotipo' => 5,
-                'cefechaini' => date('Y-m-d H:i:s'),
-                'cefechafin' => '0000-00-00 00:00:00'
-            );
-            $respuesta = $objCompraEstadoControl->altaSinID($paramCompraEstado);
-            if ($respuesta) {
-                $carrito = $listaCompras[$posCompra];
-            }
-        }
-        return $carrito;
-    }
-
-    public function verificarStockProd($objCompraCarrito, $data)
-    {
-        $respuesta = false;
-        $objCompraItemControl = new CompraItemControl();
-        $idCompra = $objCompraCarrito->getID();
-        $param = array(
-            'idproducto' => $data['idproducto'],
-            'idcompra' => $idCompra
-        );
-        $listaCompraItem = $objCompraItemControl->buscar($param);
-        if (count($listaCompraItem) > 0) {
-            $objCompraItemControl = $listaCompraItem[0];
-            $nuevaCantCI = $objCompraItemControl->getCiCantidad() + 1;
-            $objProductoControl = new ProductoControl();
-            $param['idproducto'] = $data['idproducto'];
-            $listaProd = $objProductoControl->buscar($param);
-            if (count($listaProd)) {
-                $cantStockProd = $listaProd[0]->getProCantStock();
-                if ($cantStockProd >= $nuevaCantCI) {
-                    $respuesta = true;
-                }
-            }
-        } else {
-            $respuesta = true;
-        }
-        return $respuesta;
-    }
-
     public function cancelarCompra($data)
     {
         $respuesta = false;
@@ -409,7 +261,7 @@ class CompraControl
                 // Paso 2: Crear nuevo estado "cancelada"
                 $nuevoEstado = [
                     'idcompra' => $data['idcompra'],
-                    'idcompraestadotipo' => 4, // ID de "cancelada"
+                    'idcompraestadotipo' => 4, 
                     'cefechaini' => $fechaFin,
                     'cefechafin' => null,
                 ];
@@ -635,7 +487,9 @@ class CompraControl
 
                 if (count($listaCE) > 0) {
                     $lastPosCE = count($listaCE) - 1;
-                    if (!($listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion() === "carrito")) {
+                    $estadoDesc = $listaCE[$lastPosCE]->getObjCompraEstadoTipo()->getCetDescripcion();
+                  
+                    if ($estadoDesc !== "carrito" && $estadoDesc !== "iniciada") {
                         $nuevoElem = [
                             "idcompra" => $listaCE[$lastPosCE]->getObjCompra()->getID(),
                             "cofecha" => $listaCE[$lastPosCE]->getCeFechaIni(),
@@ -711,7 +565,7 @@ class CompraControl
 
    public function actualizarEstadoCompra($idCompra, $nuevoEstadoTipo)
     {
-        // 1. Configuración
+        // Configuración
         date_default_timezone_set('America/Argentina/Buenos_Aires');
         $fechaHoraActual = date('Y-m-d H:i:s');
         $fechaCeros = '0000-00-00 00:00:00';
@@ -832,7 +686,7 @@ class CompraControl
                     'cefechafin' => '0000-00-00 00:00:00' 
                 ]);
             } else {
-                return false; // Falló la creación de la compra
+                return false; 
             }
         }
 
@@ -1029,8 +883,11 @@ class CompraControl
                 if (!empty($listaCE)) {
                     // Tomamos el último estado
                     $ultimoEstado = end($listaCE);
-                    
+                
                     $estado = $ultimoEstado->getObjCompraEstadoTipo()->getCetDescripcion();
+                    if (strtolower(trim($estado)) == 'iniciada' || strtolower(trim($estado)) == 'carrito') {
+                        continue; 
+                    }
                     $idcompraestado = $ultimoEstado->getID();
                     $fechaEstado = $ultimoEstado->getCeFechaIni();
                     
