@@ -1,25 +1,32 @@
 <?php
 // Vista/Estructura/Accion/Compra/listado.php
-require_once __DIR__ . '/../../../../Control/Session.php';
-require_once __DIR__ . '/../../../../Control/compraControl.php';
-require_once __DIR__ . '/../../../../Control/menuControl.php';
+// ACCIÓN MINIMALISTA
+
+// 1. RUTAS
+$root = __DIR__ . '/../../../../';
+require_once $root . 'Control/Session.php';
+require_once $root . 'Control/compraControl.php';
+require_once $root . 'Control/menuControl.php';
 
 $session = new Session();
-if (!$session->sesionActiva()) {
+if (!$session->activa()) {
     header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/login.php');
     exit;
 }
 
+// 2. RECUPERAR DATOS DE SESIÓN
+$idUser = $session->getIDUsuarioLogueado();
+$rol = $session->getRolActivo();
+
+// 3. INVOCAR CONTROLADOR (Lógica de negocio)
 $compraCtrl = new CompraControl();
+$compras = $compraCtrl->listarComprasSegunRol($idUser, $rol);
+
+// (Opcional) Armar menú si lo usas en el header
 $menuCtrl = new MenuControl();
 $menuData = $menuCtrl->armarMenu();
 
-$rolActivo = $session->getRolActivo();
-if (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador') {
-    $compras = $compraCtrl->listarComprasUsuarios();
-} else {
-    $idUser = $session->getIDUsuarioLogueado();
-    $compras = $compraCtrl->listarCompras($idUser);
-}
-
-require_once __DIR__ . '/../../../../Vista/listadoCompras.php';
+// 4. CARGAR VISTA (Presentación)
+// Ojo a la ruta: Sale 4 niveles -> entra a Vista -> entra a compra
+require_once __DIR__ . '/../../../../Vista/Compra/listadoCompras.php';
+?>

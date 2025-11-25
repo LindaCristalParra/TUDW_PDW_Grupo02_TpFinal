@@ -940,4 +940,30 @@ class CompraControl
         }
     }
 
+/**
+     * Devuelve el listado de compras correspondiente según el rol del usuario.
+     * Si es Admin -> Todas. Si es Cliente -> Solo las suyas.
+     * @param int $idUsuario
+     * @param array $rolActivo
+     * @return array Lista de compras
+     */
+    public function listarComprasSegunRol($idUsuario, $rolActivo)
+    {
+        // Normalizamos el nombre del rol para evitar errores de mayúsculas
+        $esAdmin = false;
+        if (!empty($rolActivo) && isset($rolActivo['rol'])) {
+            if (strtolower($rolActivo['rol']) === 'administrador' || $rolActivo['id'] == 1) {
+                $esAdmin = true;
+            }
+        }
+
+        if ($esAdmin) {
+            // El Admin ve todo el historial del sistema
+            return $this->listarComprasUsuarios();
+        } else {
+            // El Cliente solo ve su historial
+            return $this->listarCompras($idUsuario);
+        }
+    }
+
 }
