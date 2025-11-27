@@ -1,7 +1,7 @@
 <?php
 // Ubicación: Vista/Estructura/Accion/Menu/enConstruccion.php
 
-include_once __DIR__ . '/../../header.php';
+include_once __DIR__ . '/Estructura/header.php';
 ?>
 
 <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;">
@@ -11,8 +11,8 @@ include_once __DIR__ . '/../../header.php';
         <h1 class="mt-3 mb-3" style="color: var(--pine-green);">Sección en Construcción</h1>
         
         <p class="lead text-muted">
-            Estamos trabajando en esta funcionalidad.<br>
-            (Ubicación: Vista/Estructura/Accion/Menu/)
+            Estamos trabajando para está sección.<br>
+            
         </p>
         
         <div class="mt-4">
@@ -24,5 +24,5 @@ include_once __DIR__ . '/../../header.php';
 </div>
 
 <?php
-include_once __DIR__ . '/../../footer.php';
+include_once __DIR__ . '/Estructura/footer.php';
 ?>

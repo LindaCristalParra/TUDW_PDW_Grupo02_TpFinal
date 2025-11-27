@@ -455,4 +455,43 @@ class MenuControl
         $obj[0]->setMeDescripcion($param['descripcion']);
         return $obj[0]->modificarDescripcion();
     }
+
+/**
+     * Crea un menú y le asigna los roles seleccionados automáticamente.
+     * @param array $datosMenu 
+     * @param array $idsRoles 
+     * @return boolean
+     */
+    public function altaConRoles($datosMenu, $idsRoles)
+    {
+        // Crear el Menú en la tabla 'menu'
+        if (!$this->alta($datosMenu)) {
+            return false;
+        }
+
+        // Obtener el ID del menú recién creado
+        // Como alta() no devuelve ID, lo buscamos por nombre (tomamos el último creado)
+        $menus = $this->buscar(['menombre' => $datosMenu['menombre']]);
+        if (empty($menus)) {
+            return false;
+        }
+        $nuevoMenu = end($menus); // El último del array
+        $idMenu = $nuevoMenu->getID();
+
+        // Asignar Roles en la tabla 'menurol'
+        $menuRolCtrl = new MenuRolControl();
+        $exitoRoles = true;
+
+        if (!empty($idsRoles) && is_array($idsRoles)) {
+            foreach ($idsRoles as $idRol) {
+                $paramRol = ['idmenu' => $idMenu, 'idrol' => $idRol];
+                // Si falla uno, marcamos error pero seguimos intentando con los otros
+                if (!$menuRolCtrl->alta($paramRol)) {
+                    $exitoRoles = false;
+                }
+            }
+        }
+
+        return $exitoRoles;
+    }
 }

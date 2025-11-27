@@ -65,52 +65,53 @@ public function cargar(){
     return $resp;
 }
 
-public function insertar(){
-    $resp = false;
-
-    $idPadre = $this->getObjMenuPadre() != "" ? "'".$this->getObjMenuPadre()->getID()."'" : 'NULL';
-    $deshabilitado= $this->getMeDeshabilitado() != '' ? $this->getMeDeshabilitado() : 'NULL';
-      
-    // Si lleva ID Autoincrement, la consulta SQL no lleva id. Y viceversa:
-    $sql="INSERT INTO menu(menombre, medescripcion, idpadre, medeshabilitado)
-        VALUES('"
-        .$this->getMeNombre()."', '"
-        .$this->getMeDescripcion()."', "
-        .$idPadre.", "
-        .$deshabilitado.");";
+public function insertar()
+    {
+        $resp = false;
+        $base = new BaseDatos();
         
-    if ($this->Iniciar()) {
-        if ($this->Ejecutar($sql)) {
-            $resp = true;
-        } else {
-            $this->setMensajeOperacion("menu->insertar: ".$this->getError());
+        // Obtenemos el objeto padre 
+        $objPadre = $this->getObjMenuPadre();
+        
+        // Por defecto, asumimos que es NULL
+        $sqlPadre = "NULL"; 
+        
+        // Si hay un objeto padre válido, sacamos su ID y le ponemos comillas
+        if ($objPadre != null && is_object($objPadre)) {
+            $id = $objPadre->getID();
+            if (!empty($id) && $id !== 'null') {
+                $sqlPadre = "'" . $id . "'";
+            }
         }
-    } else {
-        $this->setMensajeOperacion("menu->insertar: ".$this->getError());
-    }
-    return $resp;
-}
-
-
-/* public function insertarDos(){
-    $resp = false;
-      
-    // Si lleva ID Autoincrement, la consulta SQL no lleva id. Y viceversa:
-    $sql="INSERT INTO menu(menombre, medescripcion)
-        VALUES('"
-        .$this->getMeNombre()."', '"
-        .$this->getMeDescripcion()."');";
-    if ($this->Iniciar()) {
-        if ($this->Ejecutar($sql)) {
-            $resp = true;
-        } else {
-            $this->setMensajeOperacion("menu->insertar: ".$this->getError());
+        
+        // MANEJO DE FECHA DESHABILITADO
+        $fecha = $this->getMeDeshabilitado();
+        $sqlDeshabilitado = "NULL";
+        
+        if ($fecha != null && $fecha != '' && $fecha != '0000-00-00 00:00:00') {
+            $sqlDeshabilitado = "'" . $fecha . "'";
         }
-    } else {
-        $this->setMensajeOperacion("menu->insertar: ".$this->getError());
+        
+        // CONSULTA SQL
+       
+        $sql = "INSERT INTO menu(menombre, medescripcion, idpadre, medeshabilitado)
+                VALUES('" . $this->getMeNombre() . "', 
+                       '" . $this->getMeDescripcion() . "', 
+                       " . $sqlPadre . ", 
+                       " . $sqlDeshabilitado . ")";
+
+        if ($base->Iniciar()) {
+            if ($elid = $base->Ejecutar($sql)) {
+                $this->setID($elid);
+                $resp = true;
+            } else {
+                $this->setMensajeOperacion("Menu->insertar: " . $base->getError());
+            }
+        } else {
+            $this->setMensajeOperacion("Menu->insertar: " . $base->getError());
+        }
+        return $resp;
     }
-    return $resp;
-} */
 
 public function modificarDescripcion(){
     $resp = false;
