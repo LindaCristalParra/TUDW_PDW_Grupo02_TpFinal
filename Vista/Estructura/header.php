@@ -105,32 +105,82 @@ if (!empty($rolActivo) && isset($rolActivo['rol'])) {
 
             <?php
 
-            // El header no debe decidir rutas ni roles: el action debe preparar $menuData.
+            // El header no debe decidir rutas ni roles: el action puede preparar $menuData.
+            // Si no lo hace, intentamos armarlo desde la base de datos según la sesión.
             // Estructura esperada: $menuData = ['left'=> [ ['url'=>'...','label'=>'...'], ... ], 'right'=>[...] ]
+
+            if (!isset($menuData) || !is_array($menuData)) {
+                $menuData = ['left' => [], 'right' => []];
+                if ($session->sesionActiva()) {
+                    require_once __DIR__ . '/../../Control/menuControl.php';
+                    $mc = new MenuControl();
+                    $menuFinal = $mc->armarMenu();
+
+                    // Map DB menu names to application routes (case-insensitive)
+                    // Normalized route map (keys have no spaces/lowercase)
+                    $routeMap = [
+                        'inicio' => '/TUDW_PDW_Grupo02_TpFinal/Vista/index.php',
+                        'productos' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php',
+                        'miscompras' => '/TUDW_PDW_Grupo02_TpFinal/Vista/listadoCompras.php',
+                        'carrito' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php',
+                        'panel' => '/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php'
+                    ];
+
+                    if (!empty($menuFinal['permisos'])) {
+                        foreach ($menuFinal['permisos'] as $perm) {
+                            $label = isset($perm['menombre']) ? $perm['menombre'] : 'Menu';
+                            // Normalize label to a key: lowercase, remove spaces and non-alphanumeric
+                            $key = strtolower(preg_replace('/[^a-z0-9]/i', '', $label));
+                            // Do not add 'carrito' to left menu since cart is represented by an icon on the right
+                            if ($key === 'carrito') {
+                                continue;
+                            }
+                            $url = isset($routeMap[$key]) ? $routeMap[$key] : '#';
+                            $menuData['left'][] = ['label' => $label, 'url' => $url];
+                        }
+                    }
+
+                    if (!empty($menuFinal['right'])) {
+                        $menuData['right'] = $menuFinal['right'];
+                    }
+                }
+            }
 
             if (isset($menuData) && is_array($menuData)) {
                 echo '<ul class="navbar-nav me-auto mb-2 mb-lg-0">';
-                // Link público a Inicio y Productos (siempre visibles)
-                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">Inicio</a></li>';
-                echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php">Productos</a></li>';
 
-                // Mostrar "Mis compras" solo para usuarios logueados que no sean administradores
-                if ($session->sesionActiva() && empty($isAdmin)) {
-                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/listadoCompras.php">Mis compras</a></li>';
-                }
-
-                if (!empty($menuData['left'])) {
+                // If menuData provides left items, render those (DB-driven). Otherwise render defaults.
+                    if (!empty($menuData['left'])) {
                     foreach ($menuData['left'] as $item) {
                         $url = isset($item['url']) ? $item['url'] : '#';
                         $label = isset($item['label']) ? $item['label'] : (isset($item['nombre']) ? $item['nombre'] : 'Menu');
+                        // skip cart item if someone added it in the DB or via menuData
+                        $itemKey = strtolower(preg_replace('/[^a-z0-9]/i', '', $label));
+                        if ($itemKey === 'carrito') continue;
                         echo '<li class="nav-item"><a class="nav-link" href="'.htmlspecialchars($url).'">'.htmlspecialchars($label).'</a></li>';
                     }
-
-                }
-
-                // Mostrar Panel en el left nav si es administrador
-                if (!empty($isAdmin)) {
-                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                    // Ensure admin panel visible if user is admin and not present in DB-driven list
+                    if ($isAdmin) {
+                        $foundPanel = false;
+                        foreach ($menuData['left'] as $m) {
+                            $lbl = strtolower(trim($m['label'] ?? ($m['nombre'] ?? '')));
+                            if ($lbl === 'panel') { $foundPanel = true; break; }
+                        }
+                        if (!$foundPanel) {
+                            echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                        }
+                    }
+                } else {
+                    // Defaults for public/unauthenticated or when DB has no left items
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/index.php">Inicio</a></li>';
+                    echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php">Productos</a></li>';
+                    // Mostrar "Mis compras" solo para usuarios logueados que no sean administradores
+                    if ($session->sesionActiva() && !$isAdmin) {
+                        echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/listadoCompras.php">Mis compras</a></li>';
+                    }
+                    if ($isAdmin) {
+                        echo '<li class="nav-item"><a class="nav-link" href="/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php">Panel</a></li>';
+                    }
                 }
 
                 echo '</ul>';

@@ -11,7 +11,13 @@ if (!$session->sesionActiva()) {
 }
 
 $rol = $session->getRolActivo();
-$isAdmin = (!empty($rol) && isset($rol['rol']) && strtolower($rol['rol']) === 'administrador');
+$isAdmin = false;
+if (!empty($rol) && isset($rol['rol'])) {
+    $rolDesc = strtolower($rol['rol']);
+    if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador') {
+        $isAdmin = true;
+    }
+}
 if (!$isAdmin) {
     // acceso denegado
     header('HTTP/1.1 403 Forbidden');

@@ -9,12 +9,7 @@ if (!$session->sesionActiva()) {
     exit;
 }
 
-$rolActivo = $session->getRolActivo();
-if (empty($rolActivo) || !isset($rolActivo['rol']) || strtolower($rolActivo['rol']) !== 'administrador') {
-    echo '<div class="container mt-4"><div class="alert alert-danger">Acceso denegado. Debés ser administrador.</div></div>';
-    require_once __DIR__ . '/../../../../Vista/Estructura/footer.php';
-    exit;
-}
+$session->exigirAdmin(__DIR__ . '/../../../../Vista/Estructura/footer.php');
 
 $menuCtrl = new MenuControl();
 $mensaje = '';

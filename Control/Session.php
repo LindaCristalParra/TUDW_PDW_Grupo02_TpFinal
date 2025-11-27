@@ -195,6 +195,40 @@ class Session
         return $resp;
     }
 
+    /**
+     * Devuelve true si el rol activo corresponde a un administrador.
+     */
+    public function esAdmin()
+    {
+        $rolActivo = $this->getRolActivo();
+        if (empty($rolActivo) || !isset($rolActivo['rol'])) return false;
+        $rolDesc = strtolower($rolActivo['rol']);
+        if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador' || ($rolActivo['id'] ?? null) == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verifica que el usuario sea administrador; si no lo es, muestra mensaje de acceso denegado,
+     * incluye un footer opcional y termina la ejecución. Uso conveniente desde vistas.
+     * @param string|null $footerPath Ruta absoluta al archivo footer.php a incluir (opcional)
+     * @param string|null $message Mensaje a mostrar (opcional)
+     */
+    public function exigirAdmin($footerPath = null, $message = null)
+    {
+        if ($message === null) {
+            $message = 'Acceso denegado. Debés ser administrador.';
+        }
+        if (!$this->sesionActiva() || !$this->esAdmin()) {
+            echo '<div class="container mt-4"><div class="alert alert-danger">'.htmlspecialchars($message).'</div></div>';
+            if (!empty($footerPath) && file_exists($footerPath)) {
+                require_once $footerPath;
+            }
+            exit;
+        }
+    }
+
 
     public function cerrar()
     {

@@ -16,7 +16,13 @@ $session = new Session();
 $logged = $session->sesionActiva();
 // Determinar rol activo para ocultar acciones a administradores
 $rolActivo = $session->getRolActivo();
-$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
+$isAdmin = false;
+if (!empty($rolActivo) && isset($rolActivo['rol'])) {
+    $rolDesc = strtolower($rolActivo['rol']);
+    if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador') {
+        $isAdmin = true;
+    }
+}
 ?>
 <div class="container mt-4">
     <h2>Productos</h2>

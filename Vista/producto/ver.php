@@ -30,7 +30,13 @@ require_once __DIR__ . '/../Estructura/header.php';
 require_once __DIR__ . '/../Util/funciones.php';
 // Determinar si el usuario es administrador
 $rolActivo = $session->getRolActivo();
-$isAdmin = (!empty($rolActivo) && isset($rolActivo['rol']) && strtolower($rolActivo['rol']) === 'administrador');
+$isAdmin = false;
+if (!empty($rolActivo) && isset($rolActivo['rol'])) {
+    $rolDesc = strtolower($rolActivo['rol']);
+    if (strpos($rolDesc, 'admin') !== false || $rolDesc === 'administrador') {
+        $isAdmin = true;
+    }
+}
 ?>
 <div class="container mt-4">
     <?php if ($product): ?>

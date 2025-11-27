@@ -9,13 +9,7 @@ if (!$session->sesionActiva()) {
     exit;
 }
 
-$rol = $session->getRolActivo();
-$isAdmin = (!empty($rol) && isset($rol['rol']) && strtolower($rol['rol']) === 'administrador');
-if (!$isAdmin) {
-    echo '<div class="container mt-4"><div class="alert alert-danger">Acceso denegado.</div></div>';
-    require_once __DIR__ . '/../Estructura/footer.php';
-    exit;
-}
+$session->exigirAdmin(__DIR__ . '/../Estructura/footer.php', 'Acceso denegado.');
 
 ?>
 <div class="container mt-4">
