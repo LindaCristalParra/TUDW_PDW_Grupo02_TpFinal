@@ -2,11 +2,6 @@
 // Vista/index.php - página de inicio con listado de productos tipo tienda
 require_once __DIR__ . '/../Control/menuControl.php';
 require_once __DIR__ . '/../Control/Session.php';
-
-$menuCtrl = new MenuControl();
-$session = new Session();
-$menuData = $menuCtrl->armarMenu();
-
 require_once __DIR__ . '/Estructura/header.php';
 ?>
 <div class="container mt-5">

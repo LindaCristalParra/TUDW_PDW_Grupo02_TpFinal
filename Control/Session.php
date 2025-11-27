@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../Control/usuarioControl.php';
-require_once __DIR__ . '/../Control/UsuarioRolControl.php';
-require_once __DIR__ . '/../Control/MenuControl.php';
-require_once __DIR__ . '/../Control/MenuRolControl.php';
+require_once __DIR__ . '/usuarioControl.php';
+require_once __DIR__ . '/UsuarioRolControl.php';
+require_once __DIR__ . '/MenuControl.php';
+require_once __DIR__ . '/MenuRolControl.php';
 class Session
 {
     public function __construct()
