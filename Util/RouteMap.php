@@ -16,7 +16,7 @@ class RouteMap
             'miscompras' => '/TUDW_PDW_Grupo02_TpFinal/Vista/listadoCompras.php',
             'carrito' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Compra/mostrarCarrito.php',
             'panel' => '/TUDW_PDW_Grupo02_TpFinal/Vista/admin/panelAdmin.php',
-            'ofertas' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Menu/enConstruccion.php',
+            'ofertas' => '/TUDW_PDW_Grupo02_TpFinal/Vista/enConstruccion.php',
             // Login / Logout mapping
             'login' => '/TUDW_PDW_Grupo02_TpFinal/Vista/login.php',
             'logout' => '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Login/logout.php'
@@ -30,9 +30,14 @@ class RouteMap
     public function resolve($label)
     {
         $key = $this->normalize($label);
-        return $this->map[$key] ?? null;
-    }
+        
+        if (isset($this->map[$key])) {
+            return $this->map[$key];
+        }
 
+        // FALLBACK: Apuntando a la carpeta de Linda
+        return '/TUDW_PDW_Grupo02_TpFinal/Vista/enConstruccion.php';
+    }
     /**
      * Normaliza una etiqueta a la clave usada en el mapa.
      */
