@@ -1,7 +1,6 @@
 <?php
 // Vista/Estructura/Accion/Compra/agregarAlCarrito.php
 
-
 // CONFIGURACIÓN DE RUTAS Y DEPENDENCIAS
 $root = __DIR__ . '/../../../../';
 require_once $root . 'Control/Session.php';
@@ -37,7 +36,7 @@ if (empty($idUsuario) || empty($idProducto)) {
 //  CREAR OBJETO DE TRANSACCIÓN E INVOCAR MÉTODO
 $abmCompra = new CompraControl();
 
-// Llama a una sola función que maneja TODA la lógica de negocio
+// Llama función para agregar producto al carrito
 $exito = $abmCompra->agregarProductoAlCarrito($idUsuario, $idProducto, $claseItem);
 
 // REDIRECCIÓN (Basada en el resultado booleano)

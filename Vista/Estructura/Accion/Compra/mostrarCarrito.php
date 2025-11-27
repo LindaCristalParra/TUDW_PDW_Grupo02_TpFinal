@@ -1,8 +1,8 @@
 <?php
 // Vista/Estructura/Accion/Compra/mostrarCarrito.php
-// ACCIÓN MINIMALISTA
 
-// 1. RUTAS
+
+//  RUTAS
 $root = __DIR__ . '/../../../../';
 require_once $root . 'Control/Session.php';
 require_once $root . 'Control/compraControl.php';
@@ -15,19 +15,15 @@ if (!$session->activa()) {
     exit;
 }
 
-// 2. RECUPERAR DATOS
+// RECUPERAR DATOS
 $idUser = $session->getIDUsuarioLogueado();
 
-// 3. INVOCAR CONTROLADORES
-// A) Productos del carrito
+// INVOCAR CONTROLADORES
 $compraCtrl = new CompraControl();
 $productos = $compraCtrl->obtenerProductosDelCarrito($idUser);
 
-// B) Menú dinámico (para el header)
-$menuCtrl = new MenuControl();
-$menuData = $menuCtrl->armarMenu();
 
-// 4. CARGAR VISTA
+// CARGAR VISTA
 require_once __DIR__ . '/../../../../Vista/compra/carrito.php';
 ?>
 

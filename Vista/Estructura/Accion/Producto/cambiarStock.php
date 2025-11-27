@@ -8,15 +8,8 @@ require_once $root . 'Control/productoControl.php';
 
 $session = new Session();
 
-// SEGURIDAD (Login + Rol Admin)
+// SEGURIDAD 
 $rol = $session->getRolActivo();
-// Validación
-$esAdmin = (!empty($rol) && ($rol['id'] == 1 || strtolower($rol['rol']) === 'administrador'));
-
-if (!$session->activa() || !$esAdmin) {
-    header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/login.php?msg=acceso_denegado');
-    exit;
-}
 
 // RECOLECCIÓN DE DATOS
 $idProducto = $_POST['idproducto'] ?? null;
@@ -33,7 +26,6 @@ if ($idProducto !== null && $cantStock !== null && is_numeric($cantStock)) {
 }
 
 // REDIRECCIÓN
-// Redirigimos al ACTION de listado para que recargue los datos
 $rutaListado = '/TUDW_PDW_Grupo02_TpFinal/Vista/Estructura/Accion/Producto/listado.php';
 
 if ($resultado) {

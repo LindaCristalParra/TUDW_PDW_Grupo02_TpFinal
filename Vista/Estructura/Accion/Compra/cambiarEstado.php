@@ -8,7 +8,6 @@ require_once $root . 'Control/compraControl.php';
 $session = new Session();
 
 // VALIDACIÓN DE ACCESO
-
 $rol = $session->getRolActivo();
 if (!$session->activa() || ($rol['id'] != 1 && $rol['rol'] != 'Administrador')) {
     header('Location: /TUDW_PDW_Grupo02_TpFinal/Vista/login.php?msg=acceso_denegado');

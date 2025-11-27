@@ -13,7 +13,6 @@ if (!$session->activa()) {
 }
 
 // RECOLECCIÓN DE DATOS
-
 $idCompItem = $_POST['idcompraitem'] ?? ($_GET['idcompraitem'] ?? null);
 $idUsuario = $session->getIDUsuarioLogueado() ?? $_SESSION['idusuario'];
 

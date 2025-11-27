@@ -2,7 +2,7 @@
 // Vista/Estructura/Accion/Compra/listado.php
 // ACCIÓN MINIMALISTA
 
-// 1. RUTAS
+// RUTAS
 $root = __DIR__ . '/../../../../';
 require_once $root . 'Control/Session.php';
 require_once $root . 'Control/compraControl.php';
@@ -14,19 +14,15 @@ if (!$session->activa()) {
     exit;
 }
 
-// 2. RECUPERAR DATOS DE SESIÓN
+//  RECUPERAR DATOS DE SESIÓN
 $idUser = $session->getIDUsuarioLogueado();
 $rol = $session->getRolActivo();
 
-// 3. INVOCAR CONTROLADOR (Lógica de negocio)
+//  INVOCAR CONTROLADOR 
 $compraCtrl = new CompraControl();
 $compras = $compraCtrl->listarComprasSegunRol($idUser, $rol);
 
-// (Opcional) Armar menú si lo usas en el header
-$menuCtrl = new MenuControl();
-$menuData = $menuCtrl->armarMenu();
 
-// 4. CARGAR VISTA (Presentación)
-// Ojo a la ruta: Sale 4 niveles -> entra a Vista -> entra a compra
+//  CARGAR VISTA 
 require_once __DIR__ . '/../../../../Vista/Compra/listadoCompras.php';
 ?>
