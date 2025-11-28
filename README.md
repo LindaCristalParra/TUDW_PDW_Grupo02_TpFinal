@@ -31,9 +31,9 @@ El sistema implementa un **Carrito de Compras** completo con roles de usuario, g
 
 * **Lenguaje:** PHP (POO).
 * **Base de Datos:** MySQL / MariaDB (`bdcarritocompras`).
-* **Frontend:** HTML5, CSS3, JavaScript (Bootstrap/jQuery según corresponda a la librería utilizada).
+* **Frontend:** HTML5, CSS3, JavaScript (Bootstrap/jQuery).
 * **Gestor de Dependencias:** Composer.
-* **Servidor Web:** Apache (XAMPP/WAMP/LAMP).
+* **Servidor Web:** Apache (XAMPP).
 
 ## 📂 Estructura del Repositorio
 
@@ -70,8 +70,8 @@ Sigue estos pasos para poner en marcha el proyecto en tu entorno local:
     * Verifica el archivo `config.php` y asegúrate de que `BASE_URL` o las credenciales de base de datos coincidan con tu configuración local (usuario, contraseña de MySQL).
 
 5.  **Ejecutar:**
-    * Coloca la carpeta del proyecto en el directorio `htdocs` (XAMPP) o `www` (WAMP).
-    * Accede desde tu navegador a: `http://localhost/TUDW_PDW_Grupo02_TpFinal/Vista/` (o la ruta correspondiente).
+    * Coloca la carpeta del proyecto en el directorio `htdocs` (XAMPP).
+    * Accede desde tu navegador a: `http://localhost/TUDW_PDW_Grupo02_TpFinal/Vista/index.php
 
 ## 👥 Integrantes del Grupo 02
 
